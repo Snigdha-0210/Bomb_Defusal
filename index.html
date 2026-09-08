@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bomb Defusal</title>
+
+    <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+
+    <!-- =====================================================
+         GAME
+    ====================================================== -->
+
+    <div id="game"></div>
+
+
+    <!-- =====================================================
+         HUD
+    ====================================================== -->
+
+    <div id="hud">
+
+        <!-- TOP LEFT -->
+
+        <div id="top-left">
+
+            <div class="hud-title">
+                BOMB DEFUSAL
+            </div>
+
+            <div class="hud-line">
+                LEVEL
+                <span id="level">1</span>
+            </div>
+
+            <div class="hud-line">
+                SCORE
+                <span id="score">0</span>
+            </div>
+
+        </div>
+
+
+        <!-- TOP RIGHT -->
+
+        <div id="objective">
+
+            <div class="objective-label">
+                OBJECTIVE
+            </div>
+
+            <div id="objective-text">
+                Locate the bomb
+            </div>
+
+        </div>
+
+
+        <!-- CROSSHAIR -->
+
+        <div id="crosshair">
+
+            <div class="crosshair-horizontal"></div>
+
+            <div class="crosshair-vertical"></div>
+
+        </div>
+
+
+        <!-- BOTTOM STATUS -->
+
+        <div id="status">
+
+            <span id="status-text">
+                CLICK TO ENTER
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         THREE.JS
+    ====================================================== -->
+
+    <script type="module" src="./src/main.js"></script>
+
+</body>
+
+</html>

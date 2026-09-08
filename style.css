@@ -1,0 +1,493 @@
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+html,
+body {
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #000;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+}
+
+
+/* =========================================================
+   GAME
+========================================================= */
+
+#game {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+}
+
+
+canvas {
+
+    display: block;
+
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
+
+#hud {
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    user-select: none;
+
+    color: white;
+
+}
+
+
+/* =========================================================
+   TOP LEFT
+========================================================= */
+
+#top-left {
+
+    position: absolute;
+
+    top: 25px;
+    left: 30px;
+
+    min-width: 245px;
+
+    padding:
+        15px 22px 18px 22px;
+
+    background:
+        rgba(3, 7, 13, 0.72);
+
+    border-left:
+        3px solid rgba(255, 255, 255, 0.9);
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.25);
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.9);
+
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.hud-title {
+
+    margin-bottom: 7px;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+}
+
+
+/* =========================================================
+   HUD LINE
+========================================================= */
+
+.hud-line {
+
+    font-size: 15px;
+
+    line-height: 1.8;
+
+    letter-spacing: 1px;
+
+}
+
+
+/* =========================================================
+   OBJECTIVE
+========================================================= */
+
+#objective {
+
+    position: absolute;
+
+    top: 25px;
+    right: 30px;
+
+    min-width: 255px;
+
+    padding:
+        15px 22px 18px 22px;
+
+    background:
+        rgba(3, 7, 13, 0.72);
+
+    border-right:
+        3px solid rgba(255, 255, 255, 0.9);
+
+    text-align: right;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.25);
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.9);
+
+}
+
+
+/* =========================================================
+   OBJECTIVE LABEL
+========================================================= */
+
+.objective-label {
+
+    margin-bottom: 5px;
+
+    font-size: 11px;
+
+    letter-spacing: 2px;
+
+    opacity: 0.65;
+
+}
+
+
+/* =========================================================
+   OBJECTIVE TEXT
+========================================================= */
+
+#objective-text {
+
+    font-size: 15px;
+
+    letter-spacing: 0.5px;
+
+}
+
+
+/* =========================================================
+   CROSSHAIR
+========================================================= */
+
+#crosshair {
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 24px;
+    height: 24px;
+
+    transform:
+        translate(-50%, -50%);
+
+}
+
+
+/* =========================================================
+   CROSSHAIR HORIZONTAL
+========================================================= */
+
+.crosshair-horizontal {
+
+    position: absolute;
+
+    left: 2px;
+    right: 2px;
+
+    top: 11px;
+
+    height: 2px;
+
+    background: white;
+
+    box-shadow:
+        0 0 5px rgba(0, 0, 0, 0.9);
+
+}
+
+
+/* =========================================================
+   CROSSHAIR VERTICAL
+========================================================= */
+
+.crosshair-vertical {
+
+    position: absolute;
+
+    top: 2px;
+    bottom: 2px;
+
+    left: 11px;
+
+    width: 2px;
+
+    background: white;
+
+    box-shadow:
+        0 0 5px rgba(0, 0, 0, 0.9);
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+#status {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 30px;
+
+    transform:
+        translateX(-50%);
+
+    padding:
+        10px 20px;
+
+    background:
+        rgba(3, 7, 13, 0.72);
+
+    font-size: 13px;
+
+    letter-spacing: 1px;
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.9);
+
+}
+
+
+/* =========================================================
+   BOMB UI
+========================================================= */
+
+#bomb-ui {
+
+    position: fixed;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    width: min(520px, 90vw);
+
+    padding: 32px;
+
+    background:
+        rgba(4, 7, 12, 0.97);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.25);
+
+    color: white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    text-align: center;
+
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.65);
+
+    display: none;
+
+    z-index: 50;
+
+}
+
+
+/* =========================================================
+   BOMB TITLE
+========================================================= */
+
+.bomb-title {
+
+    font-size: 27px;
+
+    font-weight: bold;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.bomb-subtitle {
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+    opacity: 0.55;
+
+    margin-bottom: 28px;
+
+}
+
+
+/* =========================================================
+   CURRENT WIRE
+========================================================= */
+
+.current-wire {
+
+    font-size: 19px;
+
+    margin-bottom: 25px;
+
+}
+
+
+/* =========================================================
+   WIRE BUTTONS
+========================================================= */
+
+.wire-container {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.wire-button {
+
+    width: 72px;
+
+    height: 48px;
+
+    border: none;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s,
+        opacity 0.15s;
+
+}
+
+
+.wire-button:hover {
+
+    transform:
+        translateY(-3px);
+
+}
+
+
+.wire-button.disabled {
+
+    opacity: 0.2;
+
+}
+
+
+/* =========================================================
+   DEFUSAL HELP
+========================================================= */
+
+.defusal-help {
+
+    font-size: 12px;
+
+    line-height: 1.7;
+
+    opacity: 0.55;
+
+}
+
+
+/* =========================================================
+   LEVEL COMPLETE
+========================================================= */
+
+.level-complete {
+
+    font-size: 29px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 12px;
+
+}
+
+
+.level-complete-sub {
+
+    color: #6cff91;
+
+    font-size: 15px;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.continue-text {
+
+    font-size: 12px;
+
+    opacity: 0.55;
+
+    letter-spacing: 1px;
+
+}
