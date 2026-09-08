@@ -40,6 +40,19 @@ This system adds:
 ================================================================
 */
 
+import {
+    moveEnemySafe,
+    enemyBlocked as enemyBlockedSafe
+} from "./enemyMovement.js";
+
+import {
+    patrolEnemyEnhanced
+} from "./enemyPatrol.js";
+
+import {
+    combatMoveEnemy
+} from "./enemyCombatMovement.js";
+
 import * as THREE from "three";
 
 import {
@@ -119,6 +132,8 @@ const CONFIG = {
     }
 
 };
+
+window.CONFIG = CONFIG;
 
 
 /* ================================================================
@@ -1277,117 +1292,12 @@ function moveEnemy(
     delta
 ) {
 
-    const direction =
-        target
-            .clone()
-            .sub(
-                enemy.position
-            );
-
-
-    direction.y =
-        0;
-
-
-    if (
-        direction.lengthSq() <
-        .01
-    ) {
-
-        return;
-
-    }
-
-
-    direction.normalize();
-
-
-    const nextX =
-        enemy.position.x +
-        direction.x *
-        speed *
-        delta;
-
-
-    const nextZ =
-        enemy.position.z +
-        direction.z *
-        speed *
-        delta;
-
-
-    if (
-        !enemyBlocked(
-            nextX,
-            nextZ
-        )
-    ) {
-
-        enemy.position.x =
-            nextX;
-
-        enemy.position.z =
-            nextZ;
-
-    }
-
-
-    else {
-
-        const slideX =
-            enemy.position.x +
-            direction.z *
-            speed *
-            delta;
-
-
-        const slideZ =
-            enemy.position.z -
-            direction.x *
-            speed *
-            delta;
-
-
-        if (
-            !enemyBlocked(
-                slideX,
-                slideZ
-            )
-        ) {
-
-            enemy.position.x =
-                slideX;
-
-            enemy.position.z =
-                slideZ;
-
-        }
-
-    }
-
-
-    enemy.position.x =
-        THREE.MathUtils.clamp(
-            enemy.position.x,
-            -42,
-            42
-        );
-
-
-    enemy.position.z =
-        THREE.MathUtils.clamp(
-            enemy.position.z,
-            -67,
-            -5
-        );
-
-
-    enemy.rotation.y =
-        Math.atan2(
-            direction.x,
-            direction.z
-        ) +
-        Math.PI;
+    return moveEnemySafe(
+        enemy,
+        target,
+        speed,
+        delta
+    );
 
 }
 
@@ -2459,158 +2369,11 @@ function attackEnemy(
     }
 
 
-    const distance =
-        enemy.position.distanceTo(
-            camera.position
-        );
-
-
-    /*
-     * Chase player.
-     */
-
-    if (
-        distance >
-        CONFIG.enemy.preferredDistance
-    ) {
-
-        moveEnemy(
-            enemy,
-            camera.position,
-            CONFIG.enemy.attackSpeed,
-            delta
-        );
-
-    }
-
-
-    /*
-     * Too close: back away.
-     */
-
-    else if (
-        distance <
-        CONFIG.enemy.minimumDistance
-    ) {
-
-        const away =
-            enemy.position
-                .clone()
-                .sub(
-                    camera.position
-                );
-
-
-        away.y =
-            0;
-
-
-        if (
-            away.lengthSq() > 0
-        ) {
-
-            away.normalize();
-
-
-            const target =
-                enemy.position
-                    .clone()
-                    .add(
-                        away.multiplyScalar(
-                            3
-                        )
-                    );
-
-
-            moveEnemy(
-                enemy,
-                target,
-                data.speed,
-                delta
-            );
-
-        }
-
-    }
-
-
-    /*
-     * Strafing.
-     */
-
-    else {
-
-        data.strafeTimer -=
-            delta;
-
-
-        if (
-            data.strafeTimer <= 0
-        ) {
-
-            data.strafeTimer =
-                1.1 +
-                Math.random() *
-                1.4;
-
-
-            data.strafeDirection *=
-                -1;
-
-        }
-
-
-        const toPlayer =
-            camera.position
-                .clone()
-                .sub(
-                    enemy.position
-                );
-
-
-        toPlayer.y =
-            0;
-
-
-        if (
-            toPlayer.lengthSq() > 0
-        ) {
-
-            toPlayer.normalize();
-
-
-            const side =
-                new THREE.Vector3(
-                    -toPlayer.z,
-                    0,
-                    toPlayer.x
-                );
-
-
-            side.multiplyScalar(
-                data.strafeDirection *
-                2
-            );
-
-
-            const target =
-                camera.position
-                    .clone()
-                    .add(
-                        side
-                    );
-
-
-            moveEnemy(
-                enemy,
-                target,
-                data.speed * .4,
-                delta
-            );
-
-        }
-
-    }
+    combatMoveEnemy(
+        enemy,
+        delta,
+        moveEnemy
+    );
 
 
     /*
@@ -2785,9 +2548,10 @@ function updateEnhancedEnemies(
             "patrol"
         ) {
 
-            patrolEnemy(
+            patrolEnemyEnhanced(
                 enemy,
-                delta
+                delta,
+                moveEnemy
             );
 
         }

@@ -20,7 +20,10 @@ When returning to this project, here is the exact state of what is working, how 
    - `index.html`: Base markup, HUD container, objective display, crosshair, and script loader.
    - `style.css`: Tactical HUD styling, wire buttons, overlay glassmorphism, responsive layout.
    - `src/main.js`: Core 3D engine, environment builder, weapon model, camera controls, player physics, base loop.
-   - `src/combatEnhancements.js`: Advanced combat add-on (threat direction compass, player damage vignette, wire-cutting puzzle modal, house collisions).
+   - `src/combatEnhancements.js`: Advanced combat orchestrator (threat direction compass, player damage vignette, wire-cutting puzzle modal, house collisions).
+   - `src/enemyMovement.js`: Collision-safe navigation, axis-sliding (X/Z separation), world boundary clamping, and 8-point obstacle escape routing.
+   - `src/enemyPatrol.js`: Persistent patrol route generator, village boundary clamps, stuck-state detection, natural pause intervals, and smooth yaw rotation.
+   - `src/enemyCombatMovement.js`: Dynamic combat repositioning (long-range advance, close-quarters retreat, tactical lateral strafing, and flanking pushes).
    - `src/enemyFeedback.js`: Visual detection feedback subsystem (3D-to-2D projected exclamation markers `!` above spotted enemies and "ENEMY SPOTTED" HUD banner).
    - `src/enemyInvestigation.js`: Modular gunshot acoustic detection ($22\text{m}$ radius), response delays, and pathing toward audio coordinates.
 
@@ -39,10 +42,12 @@ graph TD
     B --> H[src/enemyFeedback.js]
     B --> I[src/enemyInvestigation.js]
     
-    G --> J[Combat HUD: Health, Directional Threat]
-    G --> K[Dynamic Wire-Cutting Defusal Puzzle]
-    H --> L[3D-to-2D Projected '!' & Spotted Alert]
-    I --> M[Gunshot Acoustic Propagation & Investigation]
+    G --> J[src/enemyMovement.js - Obstacle Avoidance & Sliding]
+    G --> K[src/enemyPatrol.js - Route Planning & Recovery]
+    G --> L[src/enemyCombatMovement.js - Tactical Combat Strafing]
+    G --> M[Combat HUD & Wire Defusal Engine]
+    H --> N[3D-to-2D Projected '!' & Spotted Alert]
+    I --> O[Gunshot Acoustic Propagation & Investigation]
 ```
 
 ### 1. Core Engine & Rendering (`src/main.js`)
@@ -52,18 +57,19 @@ graph TD
 - **Detailed 3D Weapon Model**: Fully built from Three.js primitives attached directly to the camera viewmodel (receiver, barrel, handguard, magazine, stock, iron sights, and tactical player arms/hands).
 - **Shooting System**: Raycasting from screen center, muzzle flash particle cone, dynamic muzzle point light, bullet tracer logic, and hit-detection against enemy meshes.
 
-### 2. Tactical Enemy Feedback & Markers (`src/enemyFeedback.js`)
+### 2. Tactical Navigation & Movement (`src/enemyMovement.js`, `src/enemyPatrol.js`, `src/enemyCombatMovement.js`)
+- **Safe Collision-Aware Movement**: Evaluates potential coordinate steps against house bounding boxes with configurable padding ($0.65\text{m}$), falls back to isolated X or Z axis sliding when facing diagonal corners, and queries 8 radial offset angles ($1.5\text{m} - 4.0\text{m}$) for automatic obstacle escape.
+- **Patrol Route Intelligence**: Generates persistent randomized target nodes within village bounds, monitors linear displacement to detect wall traps, pauses naturally between routes, and smooths yaw orientation towards movement vectors.
+- **Combat Engagement Movement**: Repositions dynamically during firefights by advancing when distance exceeds $19\text{m}$, creating distance when cornered closer than $10\text{m}$, executing timed lateral strafes ($3.5\text{m} - 5.0\text{m}$), and randomly pressing aggressive flanking maneuvers.
+
+### 3. Perception & Feedback (`src/enemyFeedback.js`, `src/enemyInvestigation.js`)
 - **Visual Alert Banner**: "ENEMY SPOTTED" header with glow shadow and smooth fade animations when an enemy acquires line of sight on the player.
 - **Screen-Projected Markers**: Calculates dynamic 3D world coordinates above hostile meshes and projects to 2D screen pixels ($x, y$) for a floating tactical exclamation mark (`!`), automatically occluding when targets are behind the camera view frustum.
+- **Gunshot Acoustic Sensor**: Registers player firing positions within $22\text{m}$ radius with cognitive reaction delays before transitioning to investigation.
 
-### 3. Modular Investigation System (`src/enemyInvestigation.js`)
-- **Gunshot Acoustic Sensor**: Registers player firing positions within $22\text{m}$ radius.
-- **Reaction Delay & State Transition**: Implements human-like cognitive delays ($0.15\text{s} - 0.65\text{s}$) before transitioning unalerted sentries from `patrol` into `investigate`, moving them towards the audio origin and initiating a localized search pattern upon arrival.
-
-### 4. Combat & Threat Subsystem (`src/combatEnhancements.js`)
-- **Vision FOV ($58^\circ$, $36\text{m}$)**: Line-of-sight raycasts occluded by village houses.
-- **Combat HUD**: 100 HP health bar, red vignette damage flashes, 3D-to-2D directional threat indicators pointing towards active shooters.
-- **Bomb Defusal Puzzle System**: Proximity-triggered (`E` key within $4.8\text{m}$) wire-cutting modal with randomized color sequences and algorithmic defusal rules.
+### 4. Bomb Defusal Puzzle System (`src/combatEnhancements.js` & `src/main.js`)
+- **Proximity Detection**: Press `E` when within interaction radius ($4.8\text{m}$) of the pulsing C4 bomb device.
+- **Puzzle Mechanics**: Dynamic randomized wire configurations (Red, Blue, Green, Yellow, White, Black) with algorithmic defusal rules.
 
 ---
 
@@ -80,6 +86,9 @@ graph TD
 | **Phase 4** | Advanced Combat AI & Vision FOV | ✅ Complete | Vision FOV, sound hearing, states, reload cycles |
 | **Phase 4** | Enemy Feedback & 3D Projected Markers | ✅ Complete | `enemyFeedback.js` with floating alert & spotted banner |
 | **Phase 4** | Modular Gunshot Investigation AI | ✅ Complete | `enemyInvestigation.js` acoustic sensor & search pathing |
+| **Phase 4** | Safe Navigation & Stuck Recovery | ✅ Complete | `enemyMovement.js` axis sliding + 8-angle escape logic |
+| **Phase 4** | Enhanced Patrol & Routing | ✅ Complete | `enemyPatrol.js` persistent targets & smooth yaw turns |
+| **Phase 4** | Tactical Combat Movement & Strafing | ✅ Complete | `enemyCombatMovement.js` distance pacing & strafe cycles |
 | **Phase 5** | Bomb Model & Wire Defusal UI | ✅ Complete | Interactive wire-cutting puzzle modal, proximity 'E' prompt |
 | **Phase 5** | Production Build & Asset Pipeline | ✅ Complete | Zero warnings build, generated cinematic assets |
 
@@ -103,6 +112,6 @@ graph TD
 ## 🛠️ Key Global Variables & Debugging Flags
 
 - `window.houseCollisions`: Array of house bounding boxes used for collision detection across modules.
+- `window.CONFIG`: Global game and AI tuning parameters (speeds, ranges, damage, reload times).
 - `window.__enhancedEnemyAI`: Set to `true` to enable enhanced AI subsystem.
-- `CONFIG.enemy`: Adjustable AI parameters (speeds, ranges, damage values, reload durations).
 - `CONFIG.bomb.interactionDistance`: Distance threshold to trigger defusal UI ($4.8\text{m}$).

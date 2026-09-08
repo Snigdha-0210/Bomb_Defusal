@@ -30,9 +30,10 @@ Built entirely with modern vanilla JavaScript and **Three.js**, running at 60+ F
 
 - 🎯 **Full 3D FPS Experience**: First-person camera with `PointerLockControls`, WASD locomotion, sprint modifier, jump physics, and building collision detection.
 - 🔫 **Procedural 3D Weapon Rig**: Custom-built geometric assault rifle viewmodel with procedural arms, muzzle flash particle cones, dynamic weapon lighting, and raycast shooting.
-- 🧠 **Multi-State Tactical Enemy AI**: Enemies feature 5 autonomous states (`Patrol`, `Investigate`, `Attack`, `Search`, `Reload`), cone-based Vision FOV ($58^\circ$), gunshot hearing detection ($40\text{m}$ radius), and building collision avoidance.
+- 🧠 **Multi-State Tactical Enemy AI**: Enemies feature autonomous state execution (`Patrol`, `Investigate`, `Attack`, `Search`, `Reload`), cone-based Vision FOV ($58^\circ$), gunshot acoustic detection ($22\text{m} - 40\text{m}$ radius), and smart obstacle collision avoidance.
+- 🏃 **Tactical Combat Movement & Strafing**: Enemies dynamically adapt during firefights—advancing when far ($>19\text{m}$), retreating when cornered ($<10\text{m}$), executing timed lateral strafes ($3.5\text{m} - 5.0\text{m}$), and randomly pressing aggressive flanking maneuvers.
+- 🧭 **Safe Obstacle Avoidance & Escape**: Multi-layered path safety with X/Z axis separation sliding and 8-point radial escape routines when cornered near building geometry.
 - 👁️ **Enemy Feedback & 3D Projected HUD**: Real-time 3D-to-2D projected exclamation markers (`!`) tracking over alerted hostiles, accompanied by an "ENEMY SPOTTED" warning banner with occlusion handling.
-- 🔊 **Modular Gunshot Investigation**: Dedicated acoustic sensor system triggering realistic reaction delays and coordinated investigation pathing toward shooter coordinates.
 - ✂️ **Interactive Wire-Cutting Defusal**: Proximity-triggered (`E`) tactical defusal interface featuring randomized wire circuits, algorithmic rules, countdown timer tension, and detonation sequences.
 - 🗺️ **Atmospheric Nocturnal Map**: Complete procedural village environment featuring cobblestone roads, furnished houses, street lights with point lights, pine trees, barrels, crates, wooden fences, and atmospheric depth fog.
 - 🩸 **Tactical HUD & Directional Threats**: Health status indicator, damage screen vignette, floating combat alert badges, and real-time 3D-to-2D threat compass arrows.
@@ -70,10 +71,13 @@ graph TB
         GameLoop["Game Render Loop (60 FPS)"]
     end
 
-    subgraph Systems ["Modular Gameplay Subsystems"]
+    subgraph Systems ["Modular AI & Combat Subsystems"]
+        Movement["src/enemyMovement.js (Safe Navigation & Escape)"]
+        Patrol["src/enemyPatrol.js (Route Planning & Stuck Recovery)"]
+        CombatMove["src/enemyCombatMovement.js (Distance Pacing & Strafing)"]
         Feedback["src/enemyFeedback.js (3D Screen Projection '!' & Alerts)"]
         Investigate["src/enemyInvestigation.js (Acoustic Sensor & Pathing)"]
-        CombatAddon["src/combatEnhancements.js (Combat AI, Health, Threat Compass)"]
+        CombatAddon["src/combatEnhancements.js (Combat Orchestration & Health HUD)"]
         WirePuzzle["Wire Defusal Engine (Algorithmic Logic)"]
     end
 
@@ -82,6 +86,9 @@ graph TB
     GameLoop --> Feedback
     GameLoop --> Investigate
     Investigate --> CombatAddon
+    CombatAddon --> Movement
+    CombatAddon --> Patrol
+    CombatAddon --> CombatMove
     CombatAddon --> ThreeScene
     WirePuzzle --> HTML
 ```
@@ -107,9 +114,11 @@ stateDiagram-v2
     Attack --> [*]: Enemy Eliminated
 ```
 
-### Perception Breakdown
+### Perception & Movement Modules
 - **Vision ($58^\circ$ FOV, $36\text{m}$ Range)**: Enemies constantly evaluate line-of-sight vectors to the player while checking for intervening house geometry.
 - **Hearing ($22\text{m} - 40\text{m}$ Radius)**: Firing your weapon without a suppressor triggers acoustic propagation waves, causing sentries to investigate coordinates.
+- **Dynamic Navigation (`src/enemyMovement.js`)**: Sliding collision against house obstacles with 8-direction radial escape recovery when boxed in.
+- **Combat Maneuvering (`src/enemyCombatMovement.js`)**: Tactical distance maintenance with lateral strafing patterns and randomized flanking pushes.
 - **Visual Feedback (`src/enemyFeedback.js`)**: Real-time projection transforms 3D coordinate space above hostile meshes into 2D screen coordinates, rendering responsive floating danger markers.
 
 ---
@@ -141,6 +150,9 @@ BombDefusalGame/
 ├── src/
 │   ├── main.js                  # Three.js engine, map, player & rifle rig
 │   ├── combatEnhancements.js    # Combat AI, health HUD, wire puzzle
+│   ├── enemyMovement.js         # Safe navigation, sliding, & escape routing
+│   ├── enemyPatrol.js           # Route planning, stuck recovery, & yaw turns
+│   ├── enemyCombatMovement.js   # Dynamic combat repositioning & strafing
 │   ├── enemyFeedback.js         # 3D projected markers & spotted HUD banner
 │   └── enemyInvestigation.js    # Gunshot acoustic sensor & investigation pathing
 ├── index.html                   # Game HTML shell & HUD elements
@@ -196,6 +208,8 @@ BombDefusalGame/
 - [x] Gunshot hearing & Vision FOV detection
 - [x] 3D-to-2D projected enemy spotting markers & alert HUD
 - [x] Modular gunshot acoustic investigation pathing
+- [x] Safe navigation & 8-angle obstacle escape routines
+- [x] Tactical combat movement & lateral strafing
 - [x] Interactive wire-cutting defusal UI
 - [ ] 🔊 3D Spatial Audio & sound effects (gunfire, footsteps, beeping)
 - [ ] 🔢 Keypad code & Simon Says auxiliary defusal modules
