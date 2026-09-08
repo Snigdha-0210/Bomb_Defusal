@@ -1308,6 +1308,7 @@ function moveEnemy(
 
 const visionRay =
     new THREE.Raycaster();
+visionRay.camera = camera;
 
 
 function enemyCanSeePlayer(
@@ -2007,6 +2008,7 @@ function searchEnemy(
 
 const enemyRay =
     new THREE.Raycaster();
+enemyRay.camera = camera;
 
 
 function enemyFire(
