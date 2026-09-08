@@ -2,96 +2,75 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Bomb Defusal</title>
-
+    <title>Bomb Defusal — 3D Tactical FPS</title>
     <link rel="stylesheet" href="./style.css">
-
 </head>
 
 <body>
 
     <!-- =====================================================
-         GAME
+         GAME CANVAS
     ====================================================== -->
-
     <div id="game"></div>
 
 
     <!-- =====================================================
-         HUD
+         HUD OVERLAY
     ====================================================== -->
-
     <div id="hud">
 
-        <!-- TOP LEFT -->
-
+        <!-- TOP LEFT: LEVEL & SCORE -->
         <div id="top-left">
-
-            <div class="hud-title">
-                BOMB DEFUSAL
-            </div>
-
-            <div class="hud-line">
-                LEVEL
-                <span id="level">1</span>
-            </div>
-
-            <div class="hud-line">
-                SCORE
-                <span id="score">0</span>
-            </div>
-
+            <div class="hud-title">BOMB DEFUSAL</div>
+            <div class="hud-line">LEVEL <span id="level">1</span></div>
+            <div class="hud-line">SCORE <span id="score">0</span></div>
         </div>
 
-
-        <!-- TOP RIGHT -->
-
+        <!-- TOP RIGHT: MISSION OBJECTIVE & TIMER -->
         <div id="objective">
-
-            <div class="objective-label">
-                OBJECTIVE
-            </div>
-
-            <div id="objective-text">
-                Locate the bomb
-            </div>
-
+            <div class="objective-label">MISSION OBJECTIVE</div>
+            <div id="objective-text">Locate the bomb</div>
         </div>
 
-
-        <!-- CROSSHAIR -->
-
+        <!-- CENTER: TACTICAL CROSSHAIR & HITMARKER -->
         <div id="crosshair">
-
             <div class="crosshair-horizontal"></div>
-
             <div class="crosshair-vertical"></div>
-
+            <div id="crosshair-dot"></div>
+            <div id="hitmarker"></div>
         </div>
 
+        <!-- FLOATING SCORE POPUP -->
+        <div id="score-popup"></div>
 
-        <!-- BOTTOM STATUS -->
+        <!-- BOTTOM LEFT: TACTICAL SONAR RADAR -->
+        <div id="radar-container">
+            <div id="radar-sweep"></div>
+            <div id="radar-player"></div>
+            <div id="radar-blips"></div>
+            <div class="radar-label">TACTICAL SCANNER</div>
+        </div>
 
+        <!-- BOTTOM RIGHT: AMMO & WEAPON STATE -->
+        <div id="ammo-display">
+            <div class="weapon-name">M4A1 TACTICAL</div>
+            <div class="ammo-numbers"><span id="ammo-clip">30</span> <span class="ammo-slash">/</span> <span id="ammo-reserve">90</span></div>
+            <div id="reload-prompt">PRESS [R] TO RELOAD</div>
+        </div>
+
+        <!-- BOTTOM CENTER: CONTROLS & STATUS -->
         <div id="status">
-
-            <span id="status-text">
-                CLICK TO ENTER
-            </span>
-
+            <span id="status-text">CLICK TO ENTER</span>
         </div>
 
     </div>
 
 
     <!-- =====================================================
-         THREE.JS
+         SCRIPTS
     ====================================================== -->
-
     <script type="module" src="./src/main.js"></script>
 
 </body>

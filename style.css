@@ -1,493 +1,384 @@
 /* =========================================================
-   RESET
+   RESET & BASE
 ========================================================= */
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-
-/* =========================================================
-   PAGE
-========================================================= */
-
 html,
 body {
-
     width: 100%;
     height: 100%;
-
     overflow: hidden;
-
     background: #000;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    user-select: none;
 }
-
-
-/* =========================================================
-   GAME
-========================================================= */
 
 #game {
-
     position: fixed;
-
     inset: 0;
-
     width: 100%;
     height: 100%;
-
 }
-
 
 canvas {
-
     display: block;
-
 }
 
-
 /* =========================================================
-   HUD
+   HUD CONTAINER
 ========================================================= */
-
 #hud {
-
     position: fixed;
-
     inset: 0;
-
     pointer-events: none;
-
-    user-select: none;
-
     color: white;
-
+    z-index: 10;
 }
 
-
 /* =========================================================
-   TOP LEFT
+   TOP LEFT HUD: LEVEL & SCORE
 ========================================================= */
-
 #top-left {
-
     position: absolute;
-
     top: 25px;
     left: 30px;
-
-    min-width: 245px;
-
-    padding:
-        15px 22px 18px 22px;
-
-    background:
-        rgba(3, 7, 13, 0.72);
-
-    border-left:
-        3px solid rgba(255, 255, 255, 0.9);
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.25);
-
-    text-shadow:
-        0 2px 5px rgba(0, 0, 0, 0.9);
-
+    min-width: 240px;
+    padding: 16px 24px;
+    background: rgba(3, 8, 16, 0.78);
+    backdrop-filter: blur(8px);
+    border-left: 4px solid #00e5ff;
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 229, 255, 0.08);
 }
-
-
-/* =========================================================
-   TITLE
-========================================================= */
 
 .hud-title {
-
-    margin-bottom: 7px;
-
-    font-size: 20px;
-
-    font-weight: bold;
-
+    font-size: 18px;
+    font-weight: 900;
     letter-spacing: 3px;
-
+    color: #00e5ff;
+    margin-bottom: 6px;
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
 }
-
-
-/* =========================================================
-   HUD LINE
-========================================================= */
 
 .hud-line {
-
-    font-size: 15px;
-
-    line-height: 1.8;
-
-    letter-spacing: 1px;
-
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.7;
+    letter-spacing: 1.5px;
+    color: #e0f2fe;
 }
 
+.hud-line span {
+    color: #00ff88;
+    font-weight: 800;
+}
 
 /* =========================================================
-   OBJECTIVE
+   TOP RIGHT HUD: OBJECTIVE
 ========================================================= */
-
 #objective {
-
     position: absolute;
-
     top: 25px;
     right: 30px;
-
-    min-width: 255px;
-
-    padding:
-        15px 22px 18px 22px;
-
-    background:
-        rgba(3, 7, 13, 0.72);
-
-    border-right:
-        3px solid rgba(255, 255, 255, 0.9);
-
+    min-width: 260px;
+    padding: 16px 24px;
+    background: rgba(3, 8, 16, 0.78);
+    backdrop-filter: blur(8px);
+    border-right: 4px solid #ff0055;
+    border-radius: 4px;
     text-align: right;
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.25);
-
-    text-shadow:
-        0 2px 5px rgba(0, 0, 0, 0.9);
-
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 0, 85, 0.08);
 }
-
-
-/* =========================================================
-   OBJECTIVE LABEL
-========================================================= */
 
 .objective-label {
-
-    margin-bottom: 5px;
-
     font-size: 11px;
-
-    letter-spacing: 2px;
-
-    opacity: 0.65;
-
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    color: #ff0055;
+    margin-bottom: 4px;
+    text-shadow: 0 0 8px rgba(255, 0, 85, 0.6);
 }
-
-
-/* =========================================================
-   OBJECTIVE TEXT
-========================================================= */
 
 #objective-text {
-
     font-size: 15px;
-
-    letter-spacing: 0.5px;
-
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #fff;
 }
 
-
 /* =========================================================
-   CROSSHAIR
+   CROSSHAIR & HITMARKER
 ========================================================= */
-
 #crosshair {
-
     position: absolute;
-
     left: 50%;
     top: 50%;
-
-    width: 24px;
-    height: 24px;
-
-    transform:
-        translate(-50%, -50%);
-
+    width: 26px;
+    height: 26px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: transform 0.1s ease;
 }
-
-
-/* =========================================================
-   CROSSHAIR HORIZONTAL
-========================================================= */
 
 .crosshair-horizontal {
-
     position: absolute;
-
     left: 2px;
     right: 2px;
-
-    top: 11px;
-
+    top: 12px;
     height: 2px;
-
-    background: white;
-
-    box-shadow:
-        0 0 5px rgba(0, 0, 0, 0.9);
-
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
 }
-
-
-/* =========================================================
-   CROSSHAIR VERTICAL
-========================================================= */
 
 .crosshair-vertical {
-
     position: absolute;
-
     top: 2px;
     bottom: 2px;
-
-    left: 11px;
-
+    left: 12px;
     width: 2px;
-
-    background: white;
-
-    box-shadow:
-        0 0 5px rgba(0, 0, 0, 0.9);
-
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
 }
 
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-#status {
-
+#crosshair-dot {
     position: absolute;
-
-    left: 50%;
-
-    bottom: 30px;
-
-    transform:
-        translateX(-50%);
-
-    padding:
-        10px 20px;
-
-    background:
-        rgba(3, 7, 13, 0.72);
-
-    font-size: 13px;
-
-    letter-spacing: 1px;
-
-    text-shadow:
-        0 2px 5px rgba(0, 0, 0, 0.9);
-
+    left: 11px;
+    top: 11px;
+    width: 4px;
+    height: 4px;
+    background: #00ff88;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #00ff88;
 }
 
+#hitmarker {
+    position: absolute;
+    left: -8px;
+    top: -8px;
+    width: 42px;
+    height: 42px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.08s ease;
+}
+
+#hitmarker::before,
+#hitmarker::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: #ff2244;
+    top: 50%;
+    left: 0;
+    box-shadow: 0 0 6px #ff0000;
+}
+
+#hitmarker::before {
+    transform: rotate(45deg);
+}
+
+#hitmarker::after {
+    transform: rotate(-45deg);
+}
+
+#hitmarker.active {
+    opacity: 1;
+}
 
 /* =========================================================
-   BOMB UI
+   FLOATING SCORE POPUP
 ========================================================= */
+#score-popup {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 900;
+    color: #ffd700;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 2px 5px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.3s;
+}
 
-#bomb-ui {
+#score-popup.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-25px);
+}
 
-    position: fixed;
+/* =========================================================
+   BOTTOM RIGHT: AMMO DISPLAY
+========================================================= */
+#ammo-display {
+    position: absolute;
+    bottom: 30px;
+    right: 35px;
+    padding: 16px 26px;
+    background: rgba(3, 8, 16, 0.82);
+    backdrop-filter: blur(8px);
+    border-right: 4px solid #00ff88;
+    border-radius: 4px;
+    text-align: right;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 255, 136, 0.08);
+}
 
+.weapon-name {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.ammo-numbers {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #00ff88;
+    text-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+}
+
+.ammo-slash {
+    font-size: 22px;
+    color: #64748b;
+    font-weight: 400;
+}
+
+#ammo-reserve {
+    font-size: 20px;
+    color: #cbd5e1;
+    font-weight: 700;
+}
+
+#reload-prompt {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #ff3b30;
+    opacity: 0;
+    margin-top: 4px;
+    animation: blink 0.8s infinite;
+}
+
+#reload-prompt.show {
+    opacity: 1;
+}
+
+/* =========================================================
+   BOTTOM LEFT: TACTICAL SONAR RADAR
+========================================================= */
+#radar-container {
+    position: absolute;
+    bottom: 30px;
+    left: 35px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 40, 30, 0.75) 0%, rgba(2, 10, 16, 0.88) 100%);
+    border: 2px solid rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.15), inset 0 0 15px rgba(0, 255, 136, 0.1);
+    backdrop-filter: blur(6px);
+    overflow: hidden;
+}
+
+#radar-sweep {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(0, 255, 136, 0.35) 0deg, transparent 60deg, transparent 360deg);
+    animation: radarSpin 2.4s linear infinite;
+}
+
+#radar-player {
+    position: absolute;
     left: 50%;
     top: 50%;
-
-    transform:
-        translate(-50%, -50%);
-
-    width: min(520px, 90vw);
-
-    padding: 32px;
-
-    background:
-        rgba(4, 7, 12, 0.97);
-
-    border:
-        1px solid rgba(255, 255, 255, 0.25);
-
-    color: white;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    text-align: center;
-
-    box-shadow:
-        0 25px 80px rgba(0, 0, 0, 0.65);
-
-    display: none;
-
-    z-index: 50;
-
+    width: 8px;
+    height: 8px;
+    background: #00e5ff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px #00e5ff;
 }
 
-
-/* =========================================================
-   BOMB TITLE
-========================================================= */
-
-.bomb-title {
-
-    font-size: 27px;
-
-    font-weight: bold;
-
-    letter-spacing: 4px;
-
-    margin-bottom: 8px;
-
+#radar-blips {
+    position: absolute;
+    inset: 0;
 }
 
+.radar-blip {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #ff2244;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 6px #ff0000;
+}
 
-.bomb-subtitle {
+.radar-blip.bomb {
+    background: #ffd700;
+    box-shadow: 0 0 8px #ffd700;
+    animation: blink 0.6s infinite;
+}
 
-    font-size: 12px;
-
+.radar-label {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 800;
     letter-spacing: 2px;
-
-    opacity: 0.55;
-
-    margin-bottom: 28px;
-
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
 }
-
 
 /* =========================================================
-   CURRENT WIRE
+   BOTTOM CENTER: STATUS BAR
 ========================================================= */
-
-.current-wire {
-
-    font-size: 19px;
-
-    margin-bottom: 25px;
-
+#status {
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    padding: 10px 24px;
+    background: rgba(3, 8, 16, 0.85);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
 }
-
 
 /* =========================================================
-   WIRE BUTTONS
+   ANIMATIONS
 ========================================================= */
-
-.wire-container {
-
-    display: flex;
-
-    justify-content: center;
-
-    gap: 12px;
-
-    margin-bottom: 25px;
-
+@keyframes radarSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-
-.wire-button {
-
-    width: 72px;
-
-    height: 48px;
-
-    border: none;
-
-    color: white;
-
-    font-size: 15px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition:
-        transform 0.15s,
-        opacity 0.15s;
-
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
 }
 
-
-.wire-button:hover {
-
-    transform:
-        translateY(-3px);
-
-}
-
-
-.wire-button.disabled {
-
-    opacity: 0.2;
-
-}
-
-
-/* =========================================================
-   DEFUSAL HELP
-========================================================= */
-
-.defusal-help {
-
-    font-size: 12px;
-
-    line-height: 1.7;
-
-    opacity: 0.55;
-
-}
-
-
-/* =========================================================
-   LEVEL COMPLETE
-========================================================= */
-
-.level-complete {
-
-    font-size: 29px;
-
-    font-weight: bold;
-
-    letter-spacing: 3px;
-
-    margin-bottom: 12px;
-
-}
-
-
-.level-complete-sub {
-
-    color: #6cff91;
-
-    font-size: 15px;
-
-    letter-spacing: 1px;
-
-    margin-bottom: 25px;
-
-}
-
-
-.continue-text {
-
-    font-size: 12px;
-
-    opacity: 0.55;
-
-    letter-spacing: 1px;
-
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }

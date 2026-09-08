@@ -3552,12 +3552,15 @@ function solveBomb(
 
             closeBombDefusal();
 
-
-            statusText.textContent =
-                "LEVEL 1 COMPLETE";
+            if (window.onLevelVictory) {
+                window.onLevelVictory();
+            } else {
+                statusText.textContent =
+                    "MISSION ACCOMPLISHED";
+            }
 
         },
-        1300
+        1100
     );
 
 }

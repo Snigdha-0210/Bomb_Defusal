@@ -9,6 +9,45 @@ import {
     updateEnemyFeedback
 } from "./enemyFeedback.js";
 
+import {
+    playPlayerGunshot,
+    playHitmarker,
+    playReloadSound,
+    playWireSnip,
+    playExplosionSound
+} from "./audioSystem.js";
+
+import {
+    initVisualEffects,
+    createImpactSparks,
+    createHitBlood,
+    createMuzzleSmoke,
+    triggerScreenShake,
+    setWeatherMood,
+    updateVisualEffects
+} from "./visualEffects.js";
+
+import {
+    ENEMY_TYPES,
+    applyEnemyArchetype,
+    updateSniperLaser
+} from "./enemyTypes.js";
+
+import {
+    initPickups,
+    spawnEnemyDrop,
+    updatePickups,
+    clearAllPickups
+} from "./pickups.js";
+
+import {
+    getCurrentLevelConfig,
+    recordShot,
+    recordKill,
+    showVictoryScreen,
+    currentLevelIndex
+} from "./levelManager.js";
+
 /* =========================================================
    HTML
 ========================================================= */
@@ -26,6 +65,24 @@ const objectiveText =
 
 const statusText =
     document.getElementById("status-text");
+
+const ammoClipText =
+    document.getElementById("ammo-clip");
+
+const ammoReserveText =
+    document.getElementById("ammo-reserve");
+
+const reloadPrompt =
+    document.getElementById("reload-prompt");
+
+const hitmarkerElement =
+    document.getElementById("hitmarker");
+
+const scorePopupElement =
+    document.getElementById("score-popup");
+
+const radarBlipsContainer =
+    document.getElementById("radar-blips");
 
 
 /* =========================================================
@@ -109,6 +166,40 @@ game.appendChild(
     renderer.domElement
 );
 
+initVisualEffects(scene, camera);
+initPickups(scene);
+
+/* =========================================================
+   TACTICAL COMBAT & AMMO STATE
+========================================================= */
+
+let clipAmmo = 30;
+let reserveAmmo = 90;
+const maxClip = 30;
+let isReloading = false;
+let isADS = false;
+
+function updateAmmoHUD() {
+    if (ammoClipText) ammoClipText.textContent = clipAmmo;
+    if (ammoReserveText) ammoReserveText.textContent = reserveAmmo;
+    if (reloadPrompt) {
+        if (clipAmmo <= 5) reloadPrompt.classList.add("show");
+        else reloadPrompt.classList.remove("show");
+    }
+}
+
+function showScorePopup(text, color = "#ffd700") {
+    if (!scorePopupElement) return;
+    scorePopupElement.textContent = text;
+    scorePopupElement.style.color = color;
+    scorePopupElement.classList.add("show");
+    setTimeout(() => {
+        scorePopupElement.classList.remove("show");
+    }, 650);
+}
+
+updateAmmoHUD();
+
 
 /* =========================================================
    FPS CONTROLS
@@ -144,7 +235,7 @@ controls.addEventListener(
     () => {
 
         statusText.textContent =
-            "WASD MOVE • SHIFT SPRINT • SPACE JUMP • LEFT CLICK FIRE • E DEFUSE";
+            "WASD MOVE • SHIFT SPRINT • SPACE JUMP • LEFT CLICK FIRE • RIGHT CLICK ADS • R RELOAD • E DEFUSE";
 
     }
 );
@@ -163,6 +254,21 @@ controls.addEventListener(
 
     }
 );
+
+window.addEventListener("contextmenu", (e) => e.preventDefault());
+
+window.addEventListener("mousedown", (e) => {
+    if (e.button === 2 && controls.isLocked) {
+        isADS = true;
+    }
+});
+
+window.addEventListener("mouseup", (e) => {
+    if (e.button === 2) {
+        isADS = false;
+    }
+});
+
 
 
 /* =========================================================
@@ -2078,38 +2184,27 @@ function createEnemy(
 
 
 /* =========================================================
-   CREATE SIX ENEMIES
+   CREATE INITIAL LEVEL 1 ENEMIES
 ========================================================= */
 
-createEnemy(
-    -14,
-    -10
-);
+createEnemy(-14, -10);
+applyEnemyArchetype(enemies[enemies.length - 1], "ASSAULT", scene);
 
-createEnemy(
-    14,
-    -11
-);
+createEnemy(14, -11);
+applyEnemyArchetype(enemies[enemies.length - 1], "SCOUT", scene);
 
-createEnemy(
-    -17,
-    -27
-);
+createEnemy(-17, -27);
+applyEnemyArchetype(enemies[enemies.length - 1], "ASSAULT", scene);
 
-createEnemy(
-    18,
-    -28
-);
+createEnemy(18, -28);
+applyEnemyArchetype(enemies[enemies.length - 1], "SCOUT", scene);
 
-createEnemy(
-    -8,
-    -42
-);
+createEnemy(-8, -42);
+applyEnemyArchetype(enemies[enemies.length - 1], "ASSAULT", scene);
 
-createEnemy(
-    10,
-    -45
-);
+createEnemy(10, -45);
+applyEnemyArchetype(enemies[enemies.length - 1], "ASSAULT", scene);
+
 
 
 /* =========================================================
@@ -3394,235 +3489,156 @@ function shoot() {
         !controls.isLocked ||
         playerDead
     ) {
-
         return;
-
     }
 
+    if (
+        isReloading
+    ) {
+        return;
+    }
+
+    if (
+        clipAmmo <= 0
+    ) {
+        if (reloadPrompt) reloadPrompt.classList.add("show");
+        showScorePopup("NO AMMO - PRESS [R]", "#ff3b30");
+        return;
+    }
 
     if (
         !canShoot
     ) {
-
         return;
-
     }
 
-
     canShoot = false;
-
+    clipAmmo--;
+    updateAmmoHUD();
 
     setTimeout(
         () => {
-
             canShoot = true;
-
         },
-        180
+        160
     );
 
+    /* AUDIO & SCREEN SHAKE */
+    playPlayerGunshot();
+    triggerScreenShake(isADS ? 0.08 : 0.14);
+
+    /* RECORD SHOT */
+    recordShot(false, false);
 
     /* RECOIL */
-
     weapon.position.z =
         -0.72;
-
     weapon.rotation.x =
         -0.08;
 
-
     setTimeout(
         () => {
-
             weapon.position.z =
-                -0.85;
-
+                isADS ? -0.65 : -0.85;
             weapon.rotation.x =
                 -0.03;
-
         },
-        90
+        80
     );
 
-
     /* MUZZLE FLASH */
-
     muzzleFlash.visible =
         true;
-
     muzzleLight.intensity =
         5;
-
     muzzleFlashTimer =
-        0.06;
+        0.05;
 
+    createMuzzleSmoke(
+        weapon.position,
+        camera.getWorldDirection(new THREE.Vector3())
+    );
 
     /* ALERT ENEMIES */
-
     alertNearbyEnemies(
         camera.position
     );
 
-
-    /* RAY */
-
+    /* RAYCAST */
     raycaster.setFromCamera(
-        new THREE.Vector2(
-            0,
-            0
-        ),
+        new THREE.Vector2(0, 0),
         camera
     );
 
-
     /* ENEMY MESHES */
-
     const enemyObjects = [];
 
-
-    for (
-        const enemy of enemies
-    ) {
-
-        if (
-            !enemy.userData.alive
-        ) {
-
-            continue;
-
-        }
-
-
-        enemy.traverse(
-            child => {
-
-                if (
-                    child.isMesh
-                ) {
-
-                    child.userData.enemy =
-                        enemy;
-
-                    enemyObjects.push(
-                        child
-                    );
-
-                }
-
+    for (const enemy of enemies) {
+        if (!enemy.userData.alive) continue;
+        enemy.traverse(child => {
+            if (child.isMesh) {
+                child.userData.enemy = enemy;
+                enemyObjects.push(child);
             }
-        );
-
+        });
     }
 
-
-    const hits =
-        raycaster.intersectObjects(
-            enemyObjects,
-            false
-        );
-
-
-    /*
-        Find an actual body/head hit.
-
-        This prevents shooting an enemy's
-        rifle from counting as a body shot.
-    */
-
+    const enemyHits = raycaster.intersectObjects(enemyObjects, false);
     let validHit = null;
 
-
-    for (
-        const hit of hits
-    ) {
-
+    for (const hit of enemyHits) {
         if (
-            hit.object.userData.hitZone ===
-            "head" ||
-
-            hit.object.userData.hitZone ===
-            "body"
+            hit.object.userData.hitZone === "head" ||
+            hit.object.userData.hitZone === "body"
         ) {
-
-            validHit =
-                hit;
-
+            validHit = hit;
             break;
-
         }
-
     }
 
+    /* IF HIT ENEMY */
+    if (validHit) {
+        const hit = validHit;
+        const enemy = hit.object.userData.enemy;
+        if (!enemy) return;
 
-    /* MISS */
+        const isHeadshot = hit.object.userData.hitZone === "head";
+        recordShot(true, isHeadshot);
+        playHitmarker(isHeadshot);
 
-    if (
-        !validHit
-    ) {
+        if (hitmarkerElement) {
+            hitmarkerElement.classList.add("active");
+            setTimeout(() => hitmarkerElement.classList.remove("active"), 90);
+        }
 
-        score -= 1;
+        createHitBlood(hit.point);
+
+        if (isHeadshot) {
+            score += 25;
+            showScorePopup("+250 HEADSHOT", "#ff3366");
+            killEnemy(enemy, true);
+        } else {
+            score += 10;
+            const dmg = isADS ? 45 : 35;
+            enemy.userData.health -= dmg;
+
+            if (enemy.userData.health <= 0) {
+                showScorePopup("+150 KILL", "#ffd700");
+                killEnemy(enemy, false);
+            }
+        }
 
         updateHUD();
-
         return;
-
     }
 
-
-    const hit =
-        validHit;
-
-    const enemy =
-        hit.object.userData.enemy;
-
-
-    if (!enemy) {
-
-        return;
-
+    /* IF HIT ENVIRONMENT (SPARKS) */
+    const envHits = raycaster.intersectObjects(environmentMeshes, false);
+    if (envHits.length > 0) {
+        createImpactSparks(envHits[0].point, envHits[0].face ? envHits[0].face.normal : null, true);
     }
 
-
-    /* HEADSHOT */
-
-    if (
-        hit.object.userData.hitZone ===
-        "head"
-    ) {
-
-        score += 15;
-
-        killEnemy(
-            enemy
-        );
-
-    }
-
-
-    /* BODY SHOT */
-
-    else {
-
-        score += 5;
-
-        enemy.userData.health -=
-            50;
-
-
-        if (
-            enemy.userData.health <=
-            0
-        ) {
-
-            killEnemy(
-                enemy
-            );
-
-        }
-
-    }
-
-
+    score = Math.max(0, score - 1);
     updateHUD();
 
 }
@@ -3633,26 +3649,26 @@ function shoot() {
 ========================================================= */
 
 function killEnemy(
-    enemy
+    enemy,
+    isHeadshot = false
 ) {
 
     if (
         !enemy.userData.alive
     ) {
-
         return;
-
     }
 
+    enemy.userData.alive = false;
+    enemy.userData.state = "dead";
+    enemy.visible = false;
 
-    enemy.userData.alive =
-        false;
+    if (enemy.userData.laserSight) {
+        enemy.userData.laserSight.visible = false;
+    }
 
-    enemy.userData.state =
-        "dead";
-
-    enemy.visible =
-        false;
+    recordKill();
+    spawnEnemyDrop(enemy.position);
 
 }
 
@@ -3884,6 +3900,33 @@ window.addEventListener(
         keys[
             event.code
         ] = true;
+
+
+        /* =====================================================
+           R — RELOAD WEAPON
+        ===================================================== */
+
+        if (
+            event.code === "KeyR"
+        ) {
+
+            if (!isReloading && clipAmmo < maxClip && reserveAmmo > 0) {
+                isReloading = true;
+                playReloadSound();
+                showScorePopup("RELOADING...", "#00e5ff");
+                if (reloadPrompt) reloadPrompt.classList.remove("show");
+
+                setTimeout(() => {
+                    const needed = maxClip - clipAmmo;
+                    const available = Math.min(needed, reserveAmmo);
+                    clipAmmo += available;
+                    reserveAmmo -= available;
+                    isReloading = false;
+                    updateAmmoHUD();
+                }, 1000);
+            }
+
+        }
 
 
         /* =====================================================
@@ -5095,7 +5138,7 @@ function updateBomb(
 
 
 /* =========================================================
-   WEAPON UPDATE
+   WEAPON UPDATE (With Smooth ADS)
 ========================================================= */
 
 function updateWeapon(
@@ -5106,65 +5149,185 @@ function updateWeapon(
         muzzleFlashTimer >
         0
     ) {
-
         muzzleFlashTimer -=
             delta;
-
     }
-
 
     if (
         muzzleFlashTimer <=
         0
     ) {
-
         muzzleFlash.visible =
             false;
-
         muzzleLight.intensity =
             0;
-
     }
 
+    /* SMOOTH ADS TRANSITION */
+    const targetFOV = isADS ? 48 : 70;
+    camera.fov += (targetFOV - camera.fov) * Math.min(delta * 12, 1);
+    camera.updateProjectionMatrix();
+
+    const targetWeaponX = isADS ? 0 : 0.18;
+    const targetWeaponY = isADS ? -0.27 : -0.38;
+    const targetWeaponZ = isADS ? -0.65 : -0.85;
+
+    weapon.position.x += (targetWeaponX - weapon.position.x) * Math.min(delta * 14, 1);
+    weapon.position.y += (targetWeaponY - weapon.position.y) * Math.min(delta * 14, 1);
+    weapon.position.z += (targetWeaponZ - weapon.position.z) * Math.min(delta * 14, 1);
+
+    const crosshairEl = document.getElementById("crosshair");
+    if (crosshairEl) {
+        crosshairEl.style.transform = isADS ? "translate(-50%, -50%) scale(0.65)" : "translate(-50%, -50%) scale(1)";
+    }
 
     /* WEAPON BOB */
-
     if (
         controls.isLocked &&
-        !playerDead
+        !playerDead &&
+        !isADS
     ) {
-
         const moving =
             keys["KeyW"] ||
             keys["KeyS"] ||
             keys["KeyA"] ||
             keys["KeyD"];
 
-
-        if (
-            moving
-        ) {
-
-            weapon.position.y =
-                -0.38 +
+        if (moving) {
+            weapon.position.y +=
                 Math.sin(
                     performance.now() *
                     0.008
                 ) *
-                0.008;
-
+                0.005;
         }
-
-        else {
-
-            weapon.position.y =
-                -0.38;
-
-        }
-
     }
 
 }
+
+
+/* =========================================================
+   TACTICAL SONAR RADAR UPDATE
+========================================================= */
+
+function updateRadar() {
+    if (!radarBlipsContainer || !camera) return;
+    radarBlipsContainer.innerHTML = "";
+
+    const playerPos = camera.position;
+    const radarRadius = 58;
+    const scanWorldRange = 55;
+
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
+    forward.y = 0;
+    forward.normalize();
+    const cameraYaw = Math.atan2(forward.x, forward.z);
+
+    // Hostile Blips
+    for (const enemy of enemies) {
+        if (!enemy.userData.alive) continue;
+        const dx = enemy.position.x - playerPos.x;
+        const dz = enemy.position.z - playerPos.z;
+        const dist = Math.hypot(dx, dz);
+
+        if (dist <= scanWorldRange) {
+            const angleToEnemy = Math.atan2(dx, dz);
+            const relAngle = angleToEnemy - cameraYaw;
+
+            const normalizedDist = (dist / scanWorldRange) * radarRadius;
+            const blipX = 70 + Math.sin(relAngle) * normalizedDist;
+            const blipY = 70 - Math.cos(relAngle) * normalizedDist;
+
+            const blip = document.createElement("div");
+            blip.className = "radar-blip";
+            blip.style.left = `${blipX}px`;
+            blip.style.top = `${blipY}px`;
+            radarBlipsContainer.appendChild(blip);
+        }
+    }
+
+    // Bomb Blip
+    if (bomb) {
+        const bWorld = new THREE.Vector3();
+        bomb.getWorldPosition(bWorld);
+        const dx = bWorld.x - playerPos.x;
+        const dz = bWorld.z - playerPos.z;
+        const dist = Math.hypot(dx, dz);
+
+        if (dist <= scanWorldRange * 1.5) {
+            const angleToBomb = Math.atan2(dx, dz);
+            const relAngle = angleToBomb - cameraYaw;
+            const normalizedDist = Math.min(radarRadius - 4, (dist / (scanWorldRange * 1.5)) * radarRadius);
+            const blipX = 70 + Math.sin(relAngle) * normalizedDist;
+            const blipY = 70 - Math.cos(relAngle) * normalizedDist;
+
+            const bBlip = document.createElement("div");
+            bBlip.className = "radar-blip bomb";
+            bBlip.style.left = `${blipX}px`;
+            bBlip.style.top = `${blipY}px`;
+            radarBlipsContainer.appendChild(bBlip);
+        }
+    }
+}
+
+
+/* =========================================================
+   LEVEL PROGRESSION LOADER
+========================================================= */
+
+function loadLevel(config) {
+    clearAllPickups();
+    if (levelText) levelText.textContent = config.level;
+    if (objectiveText) objectiveText.textContent = config.subtitle;
+    setWeatherMood(config.mood);
+
+    // Relocate bomb
+    bomb.position.set(config.bombPos.x, config.bombPos.y, config.bombPos.z);
+    bombDefused = false;
+
+    const spawnPoints = [
+        { x: -14, z: -10 },
+        { x: 14, z: -11 },
+        { x: -17, z: -27 },
+        { x: 18, z: -28 },
+        { x: -8, z: -42 },
+        { x: 10, z: -45 },
+        { x: -22, z: -48 },
+        { x: 22, z: -50 },
+        { x: 0, z: -55 },
+        { x: -12, z: -60 },
+        { x: 12, z: -60 },
+        { x: 0, z: -20 }
+    ];
+
+    for (const enemy of enemies) {
+        scene.remove(enemy);
+    }
+    enemies.length = 0;
+
+    for (let i = 0; i < config.enemyCount; i++) {
+        const pt = spawnPoints[i % spawnPoints.length];
+        createEnemy(pt.x + (Math.random() - 0.5) * 3, pt.z + (Math.random() - 0.5) * 3);
+        const newEnemy = enemies[enemies.length - 1];
+        const typeKey = config.types[i % config.types.length];
+        applyEnemyArchetype(newEnemy, typeKey, scene);
+    }
+
+    camera.position.set(0, 2, 25);
+    playerHealth = 100;
+    updateHealthHUD();
+    clipAmmo = maxClip;
+    reserveAmmo = 90;
+    updateAmmoHUD();
+    showScorePopup(`LEVEL ${config.level} STARTED`, "#00e5ff");
+}
+
+window.onLevelVictory = () => {
+    showVictoryScreen((nextConfig) => {
+        loadLevel(nextConfig);
+    });
+};
 
 
 /* =========================================================
@@ -5174,7 +5337,7 @@ function updateWeapon(
 function updateHUD() {
 
     levelText.textContent =
-        "1";
+        currentLevelIndex + 1;
 
     scoreText.textContent =
         score;
@@ -5258,6 +5421,31 @@ function animate() {
         camera
     );
 
+    // Update sniper laser sights
+    for (const enemy of enemies) {
+        if (enemy.userData.archetype === "SNIPER") {
+            updateSniperLaser(enemy, camera.position);
+        }
+    }
+
+    // Tactical loot pickups
+    updatePickups(delta, camera.position, (type) => {
+        if (type === "health") {
+            playerHealth = Math.min(100, playerHealth + 35);
+            updateHealthHUD();
+            showScorePopup("+35 HP RESTORED", "#00ff88");
+        } else {
+            reserveAmmo += 30;
+            updateAmmoHUD();
+            showScorePopup("+30 AMMO RESTOCKED", "#00e5ff");
+        }
+    });
+
+    // Particle VFX, weather, screen shake
+    updateVisualEffects(delta, camera);
+
+    // Tactical Sonar Radar
+    updateRadar();
 
     updateBomb(
         delta
@@ -5278,6 +5466,7 @@ function animate() {
 
 
 animate();
+
 export {
     scene,
     camera,

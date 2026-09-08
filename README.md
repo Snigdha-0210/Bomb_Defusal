@@ -20,23 +20,28 @@
 
 ## 📖 Overview
 
-**Bomb Defusal** immerses players into the boots of a solo tactical operative dropped into a dark, foggy European village occupied by hostile armed combatants. Your mission: locate the high-explosive C4 charge hidden within the perimeter, eliminate patrolling sentries, and defuse the intricate wire-circuit system before the countdown expires.
+**Bomb Defusal** immerses players into the boots of a solo tactical operative dropped into an occupied European village. Your mission across escalating operations: locate the high-explosive C4 charge hidden within the perimeter, eliminate hostile combatant squads, collect tactical drops, and defuse intricate wire-circuit systems before the countdown expires.
 
-Built entirely with modern vanilla JavaScript and **Three.js**, running at 60+ FPS with custom procedural 3D weapon viewmodels, dynamic lighting, intelligent AI perception (vision FOV + sound hearing), and interactive wire-cutting puzzle mechanics.
+Built with vanilla JavaScript and **Three.js**, featuring procedural 3D weapon viewmodels with **ADS Zoom**, procedural **Web Audio API sound synthesis**, particle weather effects (rain, lightning, sparks), multi-class enemy archetypes, tactical radar, and campaign progression.
 
 ---
 
 ## ✨ Key Features
 
 - 🎯 **Full 3D FPS Experience**: First-person camera with `PointerLockControls`, WASD locomotion, sprint modifier, jump physics, and building collision detection.
-- 🔫 **Procedural 3D Weapon Rig**: Custom-built geometric assault rifle viewmodel with procedural arms, muzzle flash particle cones, dynamic weapon lighting, and raycast shooting.
-- 🧠 **Multi-State Tactical Enemy AI**: Enemies feature autonomous state execution (`Patrol`, `Investigate`, `Attack`, `Search`, `Reload`), cone-based Vision FOV ($58^\circ$), gunshot acoustic detection ($22\text{m} - 40\text{m}$ radius), and smart obstacle collision avoidance.
-- 🏃 **Tactical Combat Movement & Strafing**: Enemies dynamically adapt during firefights—advancing when far ($>19\text{m}$), retreating when cornered ($<10\text{m}$), executing timed lateral strafes ($3.5\text{m} - 5.0\text{m}$), and randomly pressing aggressive flanking maneuvers.
-- 🧭 **Safe Obstacle Avoidance & Escape**: Multi-layered path safety with X/Z axis separation sliding and 8-point radial escape routines when cornered near building geometry.
-- 👁️ **Enemy Feedback & 3D Projected HUD**: Real-time 3D-to-2D projected exclamation markers (`!`) tracking over alerted hostiles, accompanied by an "ENEMY SPOTTED" warning banner with occlusion handling.
-- ✂️ **Interactive Wire-Cutting Defusal**: Proximity-triggered (`E`) tactical defusal interface featuring randomized wire circuits, algorithmic rules, countdown timer tension, and detonation sequences.
-- 🗺️ **Atmospheric Nocturnal Map**: Complete procedural village environment featuring cobblestone roads, furnished houses, street lights with point lights, pine trees, barrels, crates, wooden fences, and atmospheric depth fog.
-- 🩸 **Tactical HUD & Directional Threats**: Health status indicator, damage screen vignette, floating combat alert badges, and real-time 3D-to-2D threat compass arrows.
+- 🔭 **Aim Down Sights (ADS)**: Right-click smoothly shifts weapon into precision iron-sights, tightens crosshairs, and narrows camera FOV ($48^\circ$).
+- 🔫 **Tactical Ammo & Reload System**: Magazine management ($30/90$) with realistic reload animation and audio cues triggered on `R`.
+- 🔊 **Procedural Web Audio Engine**: Zero-asset procedural audio synthesizing punchy gunshots, hitmarkers, headshot chimes, reload mechanical clicks, bomb tempo countdown beeps, wire snips, and victory fanfares.
+- 🌧️ **Dynamic Atmosphere & Particle VFX**: Weather systems featuring nocturnal fog, rain storms with thunder and lightning flashes, crimson alert beacons, bullet impact sparks, blood hits, and camera screen shake.
+- 🪖 **Diverse Enemy Archetypes**:
+  - 🛡️ **Assault Guard**: Standard balanced rifleman with tactical strafing.
+  - ⚡ **Scout Rusher**: High-speed flanker closing the distance rapidly.
+  - 🎯 **Marksman Sniper**: Strategic long-range sentry armed with a visible red laser targeting beam.
+  - 🦾 **Heavy Enforcer**: Armored boss unit guarding the bomb perimeter.
+- 📦 **3D Tactical Loot Drops**: Fallen enemies drop glowing Health Medkits ($+35$ HP) and Ammo Crates ($+30$ ammo).
+- 📡 **Tactical Sonar Radar HUD**: Real-time circular minimap scanner tracking hostile blips and the pulsing bomb waypoint.
+- 🏆 **Multi-Level Campaign Progression**: Seamless transition across Level 1 (Infiltration), Level 2 (Thunderstorm Siege), Level 3 (Rooftop Marksmen), and Level 4 (Red Alert Outpost) with complete Victory rank summaries (Rank S/A/B/C, Accuracy %, Kills, Time Bonus).
+- ✂️ **Interactive Wire-Cutting Defusal**: Proximity-triggered (`E`) tactical defusal interface featuring randomized wire circuits, algorithmic rules, and detonation sequences.
 
 ---
 
@@ -46,6 +51,8 @@ Built entirely with modern vanilla JavaScript and **Three.js**, running at 60+ F
 |---|---|---|
 | **Mouse Move** | **Look / Aim** | 360° first-person camera aim |
 | **Left Click** | **Fire Weapon** | Shoots bullet raycast, alerts nearby enemies within hearing radius |
+| **Right Click (Hold)** | **Aim Down Sights (ADS)** | Zooms FOV to $48^\circ$, centers weapon viewmodel for precision aim |
+| **`R`** | **Reload Weapon** | Reloads current magazine from reserve ammo ($30/90$) |
 | **`W` `A` `S` `D`** | **Movement** | Move forward, left, backward, right |
 | **`Shift`** | **Sprint** | Increases movement speed across the village |
 | **`Space`** | **Jump** | Vertical jump with gravity physics |
@@ -59,38 +66,40 @@ Built entirely with modern vanilla JavaScript and **Three.js**, running at 60+ F
 ```mermaid
 graph TB
     subgraph Client ["Client Browser Runtime"]
-        HTML["index.html (Canvas + HUD)"]
-        CSS["style.css (Tactical UI/Glassmorphism)"]
+        HTML["index.html (HUD, Sonar Radar, Ammo Counter)"]
+        CSS["style.css (Military Glassmorphism UI)"]
     end
 
     subgraph CoreEngine ["Core 3D Engine (src/main.js)"]
-        ThreeScene["Three.js Scene & Fog Pipeline"]
-        FPSControls["PointerLockControls & Player Physics"]
-        VillageGen["Procedural Village & Collision Mesh"]
-        WeaponView["Procedural Rifle Viewmodel & Shooting"]
+        ThreeScene["Three.js Scene & Lighting Pipeline"]
+        FPSControls["PointerLockControls & Physics"]
+        WeaponView["Procedural M4 Rifle with ADS & Bob"]
         GameLoop["Game Render Loop (60 FPS)"]
     end
 
-    subgraph Systems ["Modular AI & Combat Subsystems"]
+    subgraph Systems ["Modular Gameplay & Tactical Subsystems"]
+        Audio["src/audioSystem.js (Procedural Web Audio Engine)"]
+        VFX["src/visualEffects.js (Weather, Sparks, Lightning & Shake)"]
+        Archetypes["src/enemyTypes.js (Assault, Scout, Sniper with Laser, Heavy)"]
+        Pickups["src/pickups.js (3D Medkits & Ammo Drops)"]
+        LevelProgression["src/levelManager.js (Campaign Operations & Victory Modal)"]
         Movement["src/enemyMovement.js (Safe Navigation & Escape)"]
         Patrol["src/enemyPatrol.js (Route Planning & Stuck Recovery)"]
-        CombatMove["src/enemyCombatMovement.js (Distance Pacing & Strafing)"]
+        CombatMove["src/enemyCombatMovement.js (Tactical Combat Strafing)"]
         Feedback["src/enemyFeedback.js (3D Screen Projection '!' & Alerts)"]
         Investigate["src/enemyInvestigation.js (Acoustic Sensor & Pathing)"]
-        CombatAddon["src/combatEnhancements.js (Combat Orchestration & Health HUD)"]
-        WirePuzzle["Wire Defusal Engine (Algorithmic Logic)"]
+        CombatAddon["src/combatEnhancements.js (Combat AI & Defusal Logic)"]
     end
 
     HTML --> CoreEngine
     CoreEngine --> Systems
-    GameLoop --> Feedback
-    GameLoop --> Investigate
-    Investigate --> CombatAddon
+    GameLoop --> Audio
+    GameLoop --> VFX
+    GameLoop --> Pickups
+    GameLoop --> LevelProgression
     CombatAddon --> Movement
     CombatAddon --> Patrol
     CombatAddon --> CombatMove
-    CombatAddon --> ThreeScene
-    WirePuzzle --> HTML
 ```
 
 ---
@@ -111,15 +120,8 @@ stateDiagram-v2
     Reload --> Attack: Reload Complete (2.1s)
     Search --> Attack: Player Relocated
     Search --> Patrol: Search Timeout
-    Attack --> [*]: Enemy Eliminated
+    Attack --> [*]: Enemy Eliminated (Spawns Loot Crate)
 ```
-
-### Perception & Movement Modules
-- **Vision ($58^\circ$ FOV, $36\text{m}$ Range)**: Enemies constantly evaluate line-of-sight vectors to the player while checking for intervening house geometry.
-- **Hearing ($22\text{m} - 40\text{m}$ Radius)**: Firing your weapon without a suppressor triggers acoustic propagation waves, causing sentries to investigate coordinates.
-- **Dynamic Navigation (`src/enemyMovement.js`)**: Sliding collision against house obstacles with 8-direction radial escape recovery when boxed in.
-- **Combat Maneuvering (`src/enemyCombatMovement.js`)**: Tactical distance maintenance with lateral strafing patterns and randomized flanking pushes.
-- **Visual Feedback (`src/enemyFeedback.js`)**: Real-time projection transforms 3D coordinate space above hostile meshes into 2D screen coordinates, rendering responsive floating danger markers.
 
 ---
 
@@ -131,12 +133,13 @@ When approaching the bomb ($< 4.8\text{m}$), pressing **`E`** opens the tactical
 flowchart LR
     A[Locate Bomb Object] -->|Press E within 4.8m| B[Open Wire Console]
     B --> C{Analyze Circuit Logic}
-    C -->|Cut Correct Wire Sequence| D[🎉 BOMB DEFUSED / LEVEL WON]
-    C -->|Cut Wrong Wire or Timer Runs Out| E[💥 DETONATION / MISSION FAILED]
+    C -->|Cut Correct Wire Sequence| D[🎉 BOMB DEFUSED / VICTORY STATS]
+    D --> E[Continue to Next Level Operation]
+    C -->|Cut Wrong Wire or Timer Runs Out| F[💥 DETONATION / MISSION FAILED]
 ```
 
 - **Wire Variety**: Red, Blue, Green, Yellow, White, Black.
-- **Dynamic Rules**: Randomized rules each round (e.g. cutting wires by color hierarchy, position indices, or matching condition codes).
+- **Dynamic Rules**: Randomized rules each round (color hierarchy, position indices, condition codes).
 
 ---
 
@@ -149,6 +152,11 @@ BombDefusalGame/
 ├── dist/                        # Production build bundle
 ├── src/
 │   ├── main.js                  # Three.js engine, map, player & rifle rig
+│   ├── audioSystem.js           # Procedural Web Audio API sound engine
+│   ├── visualEffects.js         # Particle sparks, rain storm, lightning & screen shake
+│   ├── enemyTypes.js            # Enemy archetypes & sniper red laser targeting
+│   ├── pickups.js               # Tactical 3D glowing health & ammo loot crates
+│   ├── levelManager.js          # Campaign levels, stats tracking & Victory modal
 │   ├── combatEnhancements.js    # Combat AI, health HUD, wire puzzle
 │   ├── enemyMovement.js         # Safe navigation, sliding, & escape routing
 │   ├── enemyPatrol.js           # Route planning, stuck recovery, & yaw turns
@@ -196,38 +204,6 @@ BombDefusalGame/
    ```bash
    npm run build
    ```
-
----
-
-## 🗺️ Roadmap & Upcoming Features
-
-- [x] Three.js nocturnal village environment & lighting
-- [x] FPS camera controls & raycast collision sliding
-- [x] First-person weapon viewmodel & muzzle VFX
-- [x] Multi-state AI (Patrol, Investigate, Attack, Search, Reload)
-- [x] Gunshot hearing & Vision FOV detection
-- [x] 3D-to-2D projected enemy spotting markers & alert HUD
-- [x] Modular gunshot acoustic investigation pathing
-- [x] Safe navigation & 8-angle obstacle escape routines
-- [x] Tactical combat movement & lateral strafing
-- [x] Interactive wire-cutting defusal UI
-- [ ] 🔊 3D Spatial Audio & sound effects (gunfire, footsteps, beeping)
-- [ ] 🔢 Keypad code & Simon Says auxiliary defusal modules
-- [ ] 📡 Minimap radar with hostile ping indicators
-- [ ] 🎮 Multi-level progression & sniper enemy variants
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are warmly welcomed!
-Feel free to check the [issues page](https://github.com/Snigdha-0210/Bomb_Defusal/issues).
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ---
 
