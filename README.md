@@ -31,6 +31,8 @@ Built entirely with modern vanilla JavaScript and **Three.js**, running at 60+ F
 - 🎯 **Full 3D FPS Experience**: First-person camera with `PointerLockControls`, WASD locomotion, sprint modifier, jump physics, and building collision detection.
 - 🔫 **Procedural 3D Weapon Rig**: Custom-built geometric assault rifle viewmodel with procedural arms, muzzle flash particle cones, dynamic weapon lighting, and raycast shooting.
 - 🧠 **Multi-State Tactical Enemy AI**: Enemies feature 5 autonomous states (`Patrol`, `Investigate`, `Attack`, `Search`, `Reload`), cone-based Vision FOV ($58^\circ$), gunshot hearing detection ($40\text{m}$ radius), and building collision avoidance.
+- 👁️ **Enemy Feedback & 3D Projected HUD**: Real-time 3D-to-2D projected exclamation markers (`!`) tracking over alerted hostiles, accompanied by an "ENEMY SPOTTED" warning banner with occlusion handling.
+- 🔊 **Modular Gunshot Investigation**: Dedicated acoustic sensor system triggering realistic reaction delays and coordinated investigation pathing toward shooter coordinates.
 - ✂️ **Interactive Wire-Cutting Defusal**: Proximity-triggered (`E`) tactical defusal interface featuring randomized wire circuits, algorithmic rules, countdown timer tension, and detonation sequences.
 - 🗺️ **Atmospheric Nocturnal Map**: Complete procedural village environment featuring cobblestone roads, furnished houses, street lights with point lights, pine trees, barrels, crates, wooden fences, and atmospheric depth fog.
 - 🩸 **Tactical HUD & Directional Threats**: Health status indicator, damage screen vignette, floating combat alert badges, and real-time 3D-to-2D threat compass arrows.
@@ -68,18 +70,19 @@ graph TB
         GameLoop["Game Render Loop (60 FPS)"]
     end
 
-    subgraph CombatAddon ["Combat & AI Subsystem (src/combatEnhancements.js)"]
-        Perception["Perception Engine (Vision FOV + Gunshot Hearing)"]
-        AIBrain["Enemy Finite State Machine"]
-        ThreatHUD["Directional Compass & Health Vignette"]
-        WirePuzzle["Algorithmic Wire-Cutting Defusal Engine"]
+    subgraph Systems ["Modular Gameplay Subsystems"]
+        Feedback["src/enemyFeedback.js (3D Screen Projection '!' & Alerts)"]
+        Investigate["src/enemyInvestigation.js (Acoustic Sensor & Pathing)"]
+        CombatAddon["src/combatEnhancements.js (Combat AI, Health, Threat Compass)"]
+        WirePuzzle["Wire Defusal Engine (Algorithmic Logic)"]
     end
 
     HTML --> CoreEngine
-    CoreEngine --> CombatAddon
-    GameLoop --> Perception
-    Perception --> AIBrain
-    AIBrain --> ThreeScene
+    CoreEngine --> Systems
+    GameLoop --> Feedback
+    GameLoop --> Investigate
+    Investigate --> CombatAddon
+    CombatAddon --> ThreeScene
     WirePuzzle --> HTML
 ```
 
@@ -106,8 +109,8 @@ stateDiagram-v2
 
 ### Perception Breakdown
 - **Vision ($58^\circ$ FOV, $36\text{m}$ Range)**: Enemies constantly evaluate line-of-sight vectors to the player while checking for intervening house geometry.
-- **Hearing ($40\text{m}$ Radius)**: Firing your weapon without a suppressor triggers immediate sound waves, causing all sentries in range to enter `Investigate` mode.
-- **Combat Engagement**: Enemies strafe, maintain tactical engagement range ($8\text{m} - 15\text{m}$), and fire bursts with simulated muzzle flash and directional sound cues.
+- **Hearing ($22\text{m} - 40\text{m}$ Radius)**: Firing your weapon without a suppressor triggers acoustic propagation waves, causing sentries to investigate coordinates.
+- **Visual Feedback (`src/enemyFeedback.js`)**: Real-time projection transforms 3D coordinate space above hostile meshes into 2D screen coordinates, rendering responsive floating danger markers.
 
 ---
 
@@ -137,7 +140,9 @@ BombDefusalGame/
 ├── dist/                        # Production build bundle
 ├── src/
 │   ├── main.js                  # Three.js engine, map, player & rifle rig
-│   └── combatEnhancements.js    # Advanced AI, hearing/vision, wire puzzle
+│   ├── combatEnhancements.js    # Combat AI, health HUD, wire puzzle
+│   ├── enemyFeedback.js         # 3D projected markers & spotted HUD banner
+│   └── enemyInvestigation.js    # Gunshot acoustic sensor & investigation pathing
 ├── index.html                   # Game HTML shell & HUD elements
 ├── style.css                    # Tactical dark-mode HUD styling
 ├── package.json                 # Project configuration & npm scripts
@@ -189,6 +194,8 @@ BombDefusalGame/
 - [x] First-person weapon viewmodel & muzzle VFX
 - [x] Multi-state AI (Patrol, Investigate, Attack, Search, Reload)
 - [x] Gunshot hearing & Vision FOV detection
+- [x] 3D-to-2D projected enemy spotting markers & alert HUD
+- [x] Modular gunshot acoustic investigation pathing
 - [x] Interactive wire-cutting defusal UI
 - [ ] 🔊 3D Spatial Audio & sound effects (gunfire, footsteps, beeping)
 - [ ] 🔢 Keypad code & Simon Says auxiliary defusal modules

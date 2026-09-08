@@ -1223,7 +1223,7 @@ function enemyBlocked(
 ) {
 
     for (
-        const house of houseCollisions
+        const house of window.houseCollisions
     ) {
 
         const padding =

@@ -4,6 +4,10 @@ import {
     PointerLockControls
 } from "three/addons/controls/PointerLockControls.js";
 
+import {
+    showEnemySpotted,
+    updateEnemyFeedback
+} from "./enemyFeedback.js";
 
 /* =========================================================
    HTML
@@ -369,7 +373,7 @@ createRoad(
 ========================================================= */
 
 const houseCollisions = [];
-
+window.houseCollisions = houseCollisions;
 
 /* =========================================================
    HOUSE
@@ -4744,19 +4748,33 @@ function updateEnemies(
             seesPlayer
         ) {
 
+            /* ENEMY SPOTTED FEEDBACK */
+
+            if (
+                data.state !==
+                "attack"
+            ) {
+
+                showEnemySpotted(enemy
+                );
+
+            }
+
+
             data.state =
                 "attack";
+
 
             data.lastKnownPlayerPosition
                 .copy(
                     camera.position
                 );
 
+
             data.searchTimer =
                 8;
 
         }
-
 
         /* =================================================
            PATROL
@@ -5234,6 +5252,10 @@ function animate() {
 
     updateEnemies(
         delta
+    );
+    updateEnemyFeedback(
+        delta,
+        camera
     );
 
 
