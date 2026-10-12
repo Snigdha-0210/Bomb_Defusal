@@ -9,11 +9,12 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-ESM-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Web Audio API](https://img.shields.io/badge/Web_Audio_API-Procedural-9cf?style=for-the-badge&logo=soundcharts)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](./LICENSE)
+[![Live Demo](https://img.shields.io/badge/Demo-Play%20Online-ff4655?style=for-the-badge&logo=google-chrome&logoColor=white)](https://snigdha-0210.github.io/Bomb_Defusal/)
 [![Status](https://img.shields.io/badge/Status-Fully%20Playable%20Alpha-success?style=for-the-badge)]()
 
 **An intense, atmospheric 3D tactical FPS and bomb defusal simulation built from the ground up for modern browsers with Three.js and Vite.**
 
-[🎮 Play Locally](#-quick-start--local-play) • [🕹️ Tactical Controls](#-tactical-controls--keybindings) • [🏗️ System Architecture](#-system-architecture) • [🧠 AI Behavioral Engine](#-enemy-ai--tactical-finite-state-machine) • [🧩 Wire Defusal Puzzle](#-bomb-defusal-puzzle-system) • [📈 Level Scaling](#-campaign-operations--difficulty-scaling)
+[🌐 Play Online (Live Demo)](https://snigdha-0210.github.io/Bomb_Defusal/) • [🎮 Play Locally](#-quick-start--local-play) • [🚀 Cloud Deployment](#-deployment--hosting) • [🕹️ Tactical Controls](#-tactical-controls--keybindings) • [🏗️ System Architecture](#-system-architecture)
 
 </div>
 
@@ -413,6 +414,35 @@ BombDefusalGame/
    ```bash
    npm run build
    ```
+
+---
+
+## 🌐 Deployment & Hosting
+
+The game can be deployed for free with zero server maintenance on either **GitHub Pages** or **Render**:
+
+### Option 1: GitHub Pages (Automated via GitHub Actions)
+The repository includes a ready-to-use GitHub Actions workflow (`.github/workflows/deploy.yml`):
+1. In your GitHub repository, navigate to **Settings** $\rightarrow$ **Pages**.
+2. Under **Build and deployment** $\rightarrow$ **Source**, select **`GitHub Actions`**.
+3. Push any commit to `main` (or run the workflow manually from the **Actions** tab).
+4. Your game will automatically build and publish to:
+   ```
+   https://<your-username>.github.io/Bomb_Defusal/
+   ```
+
+### Option 2: Render (Static Site)
+The repository includes a pre-configured `render.yaml` specification:
+1. Go to your [Render Dashboard](https://dashboard.render.com/) and click **New** $\rightarrow$ **Static Site**.
+2. Connect this repository (`Snigdha-0210/Bomb_Defusal`).
+3. Fill in the build settings (or select Blueprints to read `render.yaml` automatically):
+   - **Build Command**: `npm install && npm run build`
+   - **Publish Directory**: `dist`
+4. Click **Create Static Site** — Render will build and host your game with global CDN and automated SSL!
+
+### Option 3: Vercel / Netlify
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
 
 ---
 
