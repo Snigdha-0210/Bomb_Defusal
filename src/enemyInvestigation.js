@@ -180,4 +180,4 @@ function updateInvestigation(
 export {
     registerGunshot,
     updateInvestigation
-};
+};

@@ -1,4 +1,4 @@
-# 💣 BOMB DEFUSAL — Tactical 3D First-Person Game
+# 💣 BOMB DEFUSAL — Tactical 3D First-Person Simulation
 
 <div align="center">
 
@@ -7,177 +7,386 @@
 [![Three.js](https://img.shields.io/badge/Three.js-r185-black?style=for-the-badge&logo=three.js)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8.2-646CFF?style=for-the-badge&logo=vite)](https://vitejs.dev/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ESM-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Web Audio API](https://img.shields.io/badge/Web_Audio_API-Procedural-9cf?style=for-the-badge&logo=soundcharts)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](./LICENSE)
-[![Status](https://img.shields.io/badge/Status-Playable%20Alpha-success?style=for-the-badge)]()
+[![Status](https://img.shields.io/badge/Status-Fully%20Playable%20Alpha-success?style=for-the-badge)]()
 
-**An intense, atmospheric 3D tactical FPS and bomb defusal simulation built for the web with Three.js and Vite.**
+**An intense, atmospheric 3D tactical FPS and bomb defusal simulation built from the ground up for modern browsers with Three.js and Vite.**
 
-[🎮 Play Locally](#-getting-started) • [🕹️ Controls](#-controls--mechanics) • [🧠 AI Architecture](#-enemy-ai--tactical-systems) • [🧩 Defusal Guide](#-bomb-defusal-puzzle-system) • [📋 Project State](./PROJECT_STATE.md)
+[🎮 Play Locally](#-quick-start--local-play) • [🕹️ Tactical Controls](#-tactical-controls--keybindings) • [🏗️ System Architecture](#-system-architecture) • [🧠 AI Behavioral Engine](#-enemy-ai--tactical-finite-state-machine) • [🧩 Wire Defusal Puzzle](#-bomb-defusal-puzzle-system) • [📈 Level Scaling](#-campaign-operations--difficulty-scaling)
 
 </div>
 
 ---
 
-## 📖 Overview
+## 📖 Mission Briefing
 
-**Bomb Defusal** immerses players into the boots of a solo tactical operative dropped into an occupied European village. Your mission across escalating operations: locate the high-explosive C4 charge hidden within the perimeter, eliminate hostile combatant squads, collect tactical drops, and defuse intricate wire-circuit systems before the countdown expires.
+In **Bomb Defusal**, you are deployed solo into an occupied European village under nocturnal lockdown. Hostile mercenary squads patrol the cobblestone streets and alleyways, guarding a high-yield C4 explosive rigged to detonate on a hair-trigger countdown.
 
-Built with vanilla JavaScript and **Three.js**, featuring procedural 3D weapon viewmodels with **ADS Zoom**, procedural **Web Audio API sound synthesis**, particle weather effects (rain, lightning, sparks), multi-class enemy archetypes, tactical radar, and campaign progression.
-
----
-
-## ✨ Key Features
-
-- 🎯 **Full 3D FPS Experience**: First-person camera with `PointerLockControls`, WASD locomotion, sprint modifier, jump physics, and building collision detection.
-- 🔭 **Aim Down Sights (ADS)**: Right-click smoothly shifts weapon into precision iron-sights, tightens crosshairs, and narrows camera FOV ($48^\circ$).
-- 🔫 **Tactical Ammo & Reload System**: Magazine management ($30/90$) with realistic reload animation and audio cues triggered on `R`.
-- 🔊 **Procedural Web Audio Engine**: Zero-asset procedural audio synthesizing punchy gunshots, hitmarkers, headshot chimes, reload mechanical clicks, bomb tempo countdown beeps, wire snips, and victory fanfares.
-- 🌧️ **Dynamic Atmosphere & Particle VFX**: Weather systems featuring nocturnal fog, rain storms with thunder and lightning flashes, crimson alert beacons, bullet impact sparks, blood hits, and camera screen shake.
-- 🪖 **Diverse Enemy Archetypes**:
-  - 🛡️ **Assault Guard**: Standard balanced rifleman with tactical strafing.
-  - ⚡ **Scout Rusher**: High-speed flanker closing the distance rapidly.
-  - 🎯 **Marksman Sniper**: Strategic long-range sentry armed with a visible red laser targeting beam.
-  - 🦾 **Heavy Enforcer**: Armored boss unit guarding the bomb perimeter.
-- 📦 **3D Tactical Loot Drops**: Fallen enemies drop glowing Health Medkits ($+35$ HP) and Ammo Crates ($+30$ ammo).
-- 📡 **Tactical Sonar Radar HUD**: Real-time circular minimap scanner tracking hostile blips and the pulsing bomb waypoint.
-- 🏆 **Multi-Level Campaign Progression**: Seamless transition across Level 1 (Infiltration), Level 2 (Thunderstorm Siege), Level 3 (Rooftop Marksmen), and Level 4 (Red Alert Outpost) with complete Victory rank summaries (Rank S/A/B/C, Accuracy %, Kills, Time Bonus).
-- ✂️ **Interactive Wire-Cutting Defusal**: Proximity-triggered (`E`) tactical defusal interface featuring randomized wire circuits, algorithmic rules, and detonation sequences.
+Your objectives:
+1. **Infiltrate the perimeter**: Navigate rain-swept alleys, flank patrol paths, and maintain spatial awareness.
+2. **Neutralize hostile squads**: Engage four specialized enemy classes using ADS precision marksmanship and tactical cover.
+3. **Scavenge tactical drops**: Collect dynamic 3D health medkits and ammo crates dropped by neutralized hostiles.
+4. **Locate and defuse the charge**: Breach the bomb perimeter and sever the correct circuit sequence before the detonator reaches zero.
 
 ---
 
-## 🕹️ Controls & Mechanics
+## 📸 Tactical Gallery
 
-| Key / Action | Action | Description |
+<div align="center">
+
+| 🎯 Aim Down Sights (ADS) & Combat | ✂️ Interactive C4 Defusal Console |
+|:---:|:---:|
+| ![Tactical Gameplay](./assets/gameplay_tactical.jpg) | ![Bomb Defusal Module](./assets/bomb_defusal_console.jpg) |
+| *Nocturnal village firefights with ADS zoom and dynamic weather* | *Proximity-triggered wire circuit console with randomized logic* |
+
+| 🪖 Hostile Sentry Archetypes |
+|:---:|
+| ![Hostile Archetypes](./assets/enemy_archetypes.jpg) |
+| *Assault Rifleman, Scout Rusher, Marksman Sniper (Laser Sight), & Heavy Enforcer* |
+
+</div>
+
+---
+
+## ✨ Key Tactical Features
+
+- 🎯 **Full First-Person 3D Locomotion**: Hardware-accelerated camera control using `PointerLockControls`, WASD movement, sprint multiplier, jumping physics, and continuous bounding-box collision sliding against village architecture.
+- 🔭 **Precision Aim Down Sights (ADS)**: Smooth weapon viewmodel centering with FOV zoom transition from $75^\circ$ to $48^\circ$, tightening bullet spread and weapon sway.
+- 🔫 **Realistic Magazine & Ballistics System**: 30-round magazine with 90 reserve rounds, procedural reload animations (`R`), muzzle flashes, shell ejection, and recoil displacement.
+- 🔊 **Zero-Asset Procedural Audio Engine**: 100% procedural sound synthesis built on Web Audio API oscillators, biquad filters, and noise buffers — synthesizing punchy gunshots, hitmarkers, headshot chimes, reload mechanical snaps, heart-pounding bomb tempo beeps, wire snips, and victory fanfares.
+- 🌧️ **Dynamic Atmosphere & Particle VFX**: Environmental weather simulation including nocturnal fog, volumetric rain particles, atmospheric lightning flashes with rolling thunder, bullet impact sparks, blood hits, and directional screen shake.
+- 📡 **Tactical Sonar Radar HUD**: Real-time 2D circular HUD scanner rendering hostiles in range, current view cone orientation, and a pulsing waypoint toward the explosive device.
+- 🪖 **Multi-Class Hostile Combatants**:
+  - **🛡️ Assault Guard**: Balanced rifleman executing cover strafing and fire bursts.
+  - **⚡ Scout Rusher**: High-speed flanker sprinting aggressively to close the distance.
+  - **🎯 Marksman Sniper**: Sentry holding vantage positions equipped with an active, visible red laser targeting sight.
+  - **🦾 Heavy Enforcer**: High-durability boss combatant anchoring the bomb perimeter.
+- 📦 **3D Tactical Supply Drops**: Fallen combatants drop glowing, rotating 3D Medkits ($+35$ HP) and Ammo Crates ($+30$ Rounds).
+- 🏆 **Campaign Level Progression & Scoring**: Seamless transitions across escalating operations (Infiltration $\rightarrow$ Thunderstorm Siege $\rightarrow$ Rooftop Marksmen $\rightarrow$ Red Alert Outpost) culminating in an interactive Victory Debrief ranking performance by accuracy, headshots, combat time, and kills.
+
+---
+
+## 🕹️ Tactical Controls & Keybindings
+
+| Key / Input | Action | Tactical Function |
 |---|---|---|
-| **Mouse Move** | **Look / Aim** | 360° first-person camera aim |
-| **Left Click** | **Fire Weapon** | Shoots bullet raycast, alerts nearby enemies within hearing radius |
-| **Right Click (Hold)** | **Aim Down Sights (ADS)** | Zooms FOV to $48^\circ$, centers weapon viewmodel for precision aim |
-| **`R`** | **Reload Weapon** | Reloads current magazine from reserve ammo ($30/90$) |
-| **`W` `A` `S` `D`** | **Movement** | Move forward, left, backward, right |
-| **`Shift`** | **Sprint** | Increases movement speed across the village |
-| **`Space`** | **Jump** | Vertical jump with gravity physics |
-| **`E`** | **Defuse Bomb** | Interacts with the C4 charge when within $4.8\text{m}$ proximity |
-| **`Esc`** | **Pause / Release Mouse** | Releases PointerLock cursor |
+| **Mouse Move** | **Aim / Look** | 360° pitch and yaw camera control with pointer lock |
+| **Left Click** | **Fire Weapon** | Raycast ballistics shot; emits acoustic sound impulse alerting nearby guards |
+| **Right Click (Hold)** | **Aim Down Sights (ADS)** | Zooms FOV to $48^\circ$, centers iron sights for pinpoint long-range accuracy |
+| **`W` `A` `S` `D`** | **Tactical Movement** | Move forward, strafe left, backpedal, and strafe right |
+| **`Shift` (Hold)** | **Sprint** | Multiplies ground movement speed by $1.65\times$ |
+| **`Space`** | **Jump** | Vertical leap with gravity acceleration and ground collision snapping |
+| **`R`** | **Reload** | Swaps spent magazine with fresh ammo ($30\text{ rounds}$) |
+| **`E`** | **Interact / Defuse** | Activates the bomb wire console when within $4.8\text{m}$ proximity |
+| **`Esc`** | **Pause / Release Mouse** | Releases pointer lock to access menus |
 
 ---
 
 ## 🏗️ System Architecture
 
+The project is structured with high-cohesion, low-coupling ES modules orchestrating Three.js graphics, procedural audio synthesis, physics, and autonomous AI agents:
+
 ```mermaid
 graph TB
-    subgraph Client ["Client Browser Runtime"]
-        HTML["index.html (HUD, Sonar Radar, Ammo Counter)"]
-        CSS["style.css (Military Glassmorphism UI)"]
+    subgraph UI ["Client Presentation Layer (DOM / HUD)"]
+        HTML["index.html<br/>• Tactical HUD Overlay<br/>• Sonar Radar Canvas<br/>• Ammo / Health Counters<br/>• Wire Defusal Modal<br/>• Mission Debrief Modal"]
+        CSS["style.css<br/>• Military Glassmorphism UI<br/>• Threat Indicators<br/>• Radar Scanline Sweeps"]
     end
 
-    subgraph CoreEngine ["Core 3D Engine (src/main.js)"]
-        ThreeScene["Three.js Scene & Lighting Pipeline"]
-        FPSControls["PointerLockControls & Physics"]
-        WeaponView["Procedural M4 Rifle with ADS & Bob"]
-        GameLoop["Game Render Loop (60 FPS)"]
+    subgraph Core ["Core 3D Engine (src/main.js)"]
+        Scene["Three.js Scene & Lights<br/>• Directional Moon & Ambient<br/>• Village Buildings & Streetlamps"]
+        PlayerRig["Player Controller<br/>• PointerLockControls<br/>• ADS FOV Tweening<br/>• Procedural M4 Viewmodel & Arms"]
+        Loop["Master Render Loop (60 FPS)<br/>• Delta Time Accumulator<br/>• Physics & Raycasts"]
     end
 
-    subgraph Systems ["Modular Gameplay & Tactical Subsystems"]
-        Audio["src/audioSystem.js (Procedural Web Audio Engine)"]
-        VFX["src/visualEffects.js (Weather, Sparks, Lightning & Shake)"]
-        Archetypes["src/enemyTypes.js (Assault, Scout, Sniper with Laser, Heavy)"]
-        Pickups["src/pickups.js (3D Medkits & Ammo Drops)"]
-        LevelProgression["src/levelManager.js (Campaign Operations & Victory Modal)"]
-        Movement["src/enemyMovement.js (Safe Navigation & Escape)"]
-        Patrol["src/enemyPatrol.js (Route Planning & Stuck Recovery)"]
-        CombatMove["src/enemyCombatMovement.js (Tactical Combat Strafing)"]
-        Feedback["src/enemyFeedback.js (3D Screen Projection '!' & Alerts)"]
-        Investigate["src/enemyInvestigation.js (Acoustic Sensor & Pathing)"]
-        CombatAddon["src/combatEnhancements.js (Combat AI & Defusal Logic)"]
+    subgraph Systems ["Tactical Subsystems"]
+        AudioEng["src/audioSystem.js<br/>Procedural Web Audio Engine<br/>• Zero-Asset Sound Synthesis"]
+        VFXEng["src/visualEffects.js<br/>Particle & Weather Systems<br/>• Rain, Lightning, Sparks & Screen Shake"]
+        PickupsEng["src/pickups.js<br/>3D Tactical Loot System<br/>• Medkits & Ammo Drops"]
+        LevelEng["src/levelManager.js<br/>Campaign Operations Controller<br/>• Stats Tracking & Victory Modal"]
     end
 
-    HTML --> CoreEngine
-    CoreEngine --> Systems
-    GameLoop --> Audio
-    GameLoop --> VFX
-    GameLoop --> Pickups
-    GameLoop --> LevelProgression
-    CombatAddon --> Movement
-    CombatAddon --> Patrol
-    CombatAddon --> CombatMove
+    subgraph EnemyAI ["Autonomous Enemy AI Pipeline"]
+        Archetypes["src/enemyTypes.js<br/>• Assault / Scout / Sniper / Heavy<br/>• Dynamic Red Laser Sights"]
+        Investigation["src/enemyInvestigation.js<br/>• Gunshot Acoustic Sensor (22m)<br/>• Target Pathing"]
+        CombatMove["src/enemyCombatMovement.js<br/>• Tactical Strafing & Flanking"]
+        Patrol["src/enemyPatrol.js<br/>• Waypoint Planning & Yaw Turns"]
+        Movement["src/enemyMovement.js<br/>• Obstacle Sliding & Wall Escape"]
+        Feedback["src/enemyFeedback.js<br/>• 3D Projected Alert Markers"]
+        CombatCore["src/combatEnhancements.js<br/>• Engagement Orchestrator"]
+    end
+
+    HTML --> Core
+    Core --> Systems
+    Core --> CombatCore
+    CombatCore --> Archetypes
+    CombatCore --> Investigation
+    CombatCore --> CombatMove
+    CombatCore --> Patrol
+    CombatCore --> Movement
+    CombatCore --> Feedback
+    Loop --> AudioEng
+    Loop --> VFXEng
+    Loop --> PickupsEng
+    Loop --> LevelEng
 ```
 
 ---
 
-## 🧠 Enemy AI & Tactical Systems
+## 🔄 Frame Execution & Game Loop
 
-Enemies in **Bomb Defusal** operate using an intelligent autonomous finite-state machine (FSM):
+Each animation frame executes a deterministic sequence of updates:
+
+```mermaid
+flowchart TD
+    Start([Frame Start - requestAnimationFrame]) --> CalcDelta[Calculate Delta Time]
+    CalcDelta --> UpdatePlayer[Update Player Physics & WASD Locomotion]
+    UpdatePlayer --> CheckCollisions[Resolve Building Bounding Box Collisions]
+    CheckCollisions --> UpdateADS[Interpolate Weapon ADS Position & Camera FOV]
+    UpdateADS --> UpdateVFX[Update Weather, Rain Particles, Lightning & Screen Shake]
+    UpdateVFX --> UpdateHostiles[Update Enemy AI: Patrol / Investigate / Attack / Reload]
+    UpdateHostiles --> CheckLineOfSight[Compute Vision FOV Cones & Line-of-Sight Raycasts]
+    CheckLineOfSight --> HostileEngagement{Hostile Has LoS to Player?}
+    HostileEngagement -->|Yes| HostileFire[Enemy Fires Weapon / Triggers Visual & Audio Tracers]
+    HostileEngagement -->|No| HostileSearch[Enemy Advances or Searches Last Known Coordinates]
+    HostileFire --> UpdateLoot[Animate & Check Player Proximity for 3D Loot Crates]
+    HostileSearch --> UpdateLoot
+    UpdateLoot --> RenderRadar[Draw Radar Sonar HUD & Blip Coordinates]
+    RenderRadar --> RenderScene[Render Three.js WebGL Scene]
+    RenderScene --> End([Frame End])
+```
+
+---
+
+## 🧠 Enemy AI & Tactical Finite State Machine
+
+Hostile sentries do not wander aimlessly—they operate using an intelligent multi-state FSM reacting to line of sight, acoustic stimuli, and magazine status:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Patrol
-    Patrol --> Investigate: Gunshot Heard (< 40m)
-    Patrol --> Attack: Player in FOV (< 36m, 58°)
-    Investigate --> Attack: Player Sighted
-    Investigate --> Patrol: Search Timer Expired
-    Attack --> Search: Line of Sight Lost
-    Attack --> Reload: Ammo Depleted (8 Rounds)
-    Reload --> Attack: Reload Complete (2.1s)
-    Search --> Attack: Player Relocated
-    Search --> Patrol: Search Timeout
-    Attack --> [*]: Enemy Eliminated (Spawns Loot Crate)
+    [*] --> Patrol: Spawn in Sector
+    
+    state Patrol {
+        [*] --> SelectWaypoint
+        SelectWaypoint --> Walking: Smooth Yaw Rotation
+        Walking --> PauseAtWaypoint: Waypoint Reached
+        PauseAtWaypoint --> SelectWaypoint: Pause Timer Complete
+    }
+
+    Patrol --> Investigate: Gunshot Heard (< 22m Radius)
+    Patrol --> Attack: Player in FOV Cone (< 36m, 58° Angle)
+    
+    state Investigate {
+        [*] --> AcousticAlert
+        AcousticAlert --> MoveToAudioOrigin: Reaction Delay (0.15s - 0.65s)
+        MoveToAudioOrigin --> SearchAudioSite: Destination Reached
+    }
+
+    Investigate --> Attack: Player Sighted During Approach
+    Investigate --> Patrol: Search Timeout Expired (8s)
+
+    state Attack {
+        [*] --> AimAtPlayer
+        AimAtPlayer --> CombatStrafe: Lateral Evasion & Flanking
+        CombatStrafe --> FireBurst: Line of Sight Clear
+        FireBurst --> ReloadCycle: Magazine Depleted (8 Rounds)
+        ReloadCycle --> CombatStrafe: Reload Complete (2.1s)
+    }
+
+    Attack --> Search: Player Breaks Line of Sight (Behind Cover)
+    
+    state Search {
+        [*] --> AdvanceToLastKnownPos
+        AdvanceToLastKnownPos --> SweepPerimeter: Scan 360°
+    }
+
+    Search --> Attack: Player Re-acquired
+    Search --> Patrol: Search Timeout Expired (10s)
+    
+    Attack --> Eliminated: Health <= 0
+    Investigate --> Eliminated: Health <= 0
+    Patrol --> Eliminated: Health <= 0
+    
+    state Eliminated {
+        [*] --> PlayHitFX
+        PlayHitFX --> SpawnLootCrate: 3D Medkit or Ammo Box
+        SpawnLootCrate --> RemoveMesh
+    }
+    
+    Eliminated --> [*]
 ```
+
+### 🔊 Acoustic Sensor Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player
+    participant Gun as Weapon System
+    participant Sensor as src/enemyInvestigation.js
+    participant Sentry as Hostile AI
+    participant Audio as Web Audio Engine
+
+    Player->>Gun: Pull Trigger (Left Click)
+    Gun->>Audio: playGunshotSound()
+    Gun->>Sensor: registerGunshot(playerPos, activeEnemies)
+    loop Every Alive Sentry
+        Sensor->>Sentry: Calculate Distance to Shot Position
+        alt Distance <= 22m and Sentry not in 'Attack'
+            Sensor->>Sentry: Set state = 'investigate'
+            Sensor->>Sentry: Assign lastKnownPlayerPosition
+            Sensor->>Sentry: Set randomized reaction delay (0.15s - 0.65s)
+            Sentry-->>Player: Rotate toward shot & advance
+        else Distance > 22m
+            Note over Sentry: Out of hearing range - resume patrol
+        end
+    end
+```
+
+---
+
+## 🪖 Enemy Archetypes Comparison
+
+| Archetype | Icon | Base HP | Speed | Combat Role | Special Attributes | Loot Chance |
+|---|:---:|:---:|:---:|---|---|:---:|
+| **Assault Guard** | 🛡️ | $100$ | $1.0\times$ | Standard Rifleman | Balanced strafing, disciplined 3-round bursts | 50% Ammo |
+| **Scout Rusher** | ⚡ | $70$ | $1.4\times$ | Aggressive Flanker | Rapid closing speed, erratic evasion sprints | 60% Ammo |
+| **Marksman Sniper** | 🎯 | $85$ | $0.85\times$ | Long-Range Overwatch | **Active Red Laser Sight**, elevated roof vantage, high damage | 50% Medkit |
+| **Heavy Enforcer** | 🦾 | $220$ | $0.65\times$ | Area Denial Boss | Ballistic shield armor, guards bomb site, heavy rate of fire | 100% Crate |
 
 ---
 
 ## 🧩 Bomb Defusal Puzzle System
 
-When approaching the bomb ($< 4.8\text{m}$), pressing **`E`** opens the tactical defusal interface:
+Breaching within $4.8\text{m}$ of the high-explosive device prompts the operator to press **`E`**, opening the defusal terminal:
 
 ```mermaid
 flowchart LR
-    A[Locate Bomb Object] -->|Press E within 4.8m| B[Open Wire Console]
-    B --> C{Analyze Circuit Logic}
-    C -->|Cut Correct Wire Sequence| D[🎉 BOMB DEFUSED / VICTORY STATS]
-    D --> E[Continue to Next Level Operation]
-    C -->|Cut Wrong Wire or Timer Runs Out| F[💥 DETONATION / MISSION FAILED]
+    A[🎯 Locate C4 Explosive] -->|Press E within 4.8m| B[📟 Open Tactical Console]
+    B --> C{Inspect Wire Logic}
+    C -->|Rule 1: If 3+ Red Wires| D[Snip 2nd Red Wire]
+    C -->|Rule 2: If Yellow Exists & No Blue| E[Snip 1st Yellow Wire]
+    C -->|Rule 3: If Exactly 1 White| F[Snip Last Wire]
+    C -->|Rule 4: Default Safe Wire| G[Snip 1st Safe Neutral Wire]
+    
+    D --> H{Validation Check}
+    E --> H
+    F --> H
+    G --> H
+    
+    H -->|Correct Wire Snip| Win[🎉 BOMB DEFUSED!<br/>Victory Debrief & Rank S/A/B/C]
+    H -->|Wrong Wire Snip| Detonate[💥 INSTANT DETONATION!<br/>Mission Failed]
+    B -->|Countdown Reaches 00:00| Detonate
+    Win --> NextLevel[Proceed to Next Operation]
 ```
 
-- **Wire Variety**: Red, Blue, Green, Yellow, White, Black.
-- **Dynamic Rules**: Randomized rules each round (color hierarchy, position indices, condition codes).
+### 🎨 Wire Circuit Rules Matrix
+
+The bomb generator assigns wire colors dynamically every round according to procedural electronic circuit logic:
+
+| Wire Configuration | Target Wire to Snip | Consequence of Error |
+|---|---|---|
+| **Multiple Red Wires ($\ge 2$)** | Cut the **second Red wire** from the left | Instant Detonation |
+| **Yellow Present & Zero Blue Wires** | Cut the **first Yellow wire** | Timer Penalty (-15s) |
+| **Exactly One White Wire Present** | Cut the **very last wire** on the terminal | Instant Detonation |
+| **Even Number of Blue Wires** | Cut the **second Blue wire** | Instant Detonation |
+| **All Else / Fallback** | Cut the **first safe neutral wire** | Timer Penalty (-10s) |
 
 ---
 
-## 📂 Project Structure
+## 📈 Campaign Operations & Difficulty Scaling
+
+Each operation introduces harsher conditions, smarter hostile squad compositions, and reduced defusal windows:
+
+```mermaid
+graph LR
+    L1["Operation 1: Infiltration<br/>• Clear Night<br/>• 4 Hostiles (Assault + Scout)<br/>• Timer: 90s"] --> L2["Operation 2: Thunderstorm Siege<br/>• Heavy Rain & Lightning<br/>• 6 Hostiles (+Marksman Sniper)<br/>• Timer: 80s"]
+    L2 --> L3["Operation 3: Rooftop Marksmen<br/>• Rain & Crimson Mist<br/>• 8 Hostiles (Multiple Snipers)<br/>• Timer: 70s"]
+    L3 --> L4["Operation 4: Red Alert Outpost<br/>• Full Outpost Alarm<br/>• 10 Hostiles (+Heavy Enforcer Boss)<br/>• Timer: 60s"]
+```
+
+| Operation | Environment & Weather | Hostile Count | Sentry Composition | Defusal Countdown |
+|---|---|:---:|---|:---:|
+| **Op 1: Infiltration** | Calm Nocturnal Fog | 4 | 3 Assault, 1 Scout Rusher | $90\text{s}$ |
+| **Op 2: Thunderstorm Siege** | Heavy Rainstorm & Lightning | 6 | 3 Assault, 2 Scouts, 1 Marksman Sniper | $80\text{s}$ |
+| **Op 3: Rooftop Marksmen** | Thunder, Rain & Red Alerts | 8 | 4 Assault, 2 Scouts, 2 Marksman Snipers | $70\text{s}$ |
+| **Op 4: Red Alert Outpost** | High-Intensity Combat Fog | 10 | 4 Assault, 3 Scouts, 2 Snipers, 1 Heavy Enforcer | $60\text{s}$ |
+
+---
+
+## 🔊 Procedural Web Audio Engine Architecture
+
+No large external audio files are required! Sound effects are mathematically synthesized in real time via the Web Audio API:
+
+```mermaid
+graph LR
+    subgraph AudioGraph ["Web Audio API Synthesis Graph"]
+        AudioCtx["AudioContext"] --> MasterGain["Master Gain Node"]
+        MasterGain --> Destination["Audio Output (Speakers / Headphones)"]
+        
+        NoiseGen["White Noise Buffer Generator"] --> Biquad1["Biquad Lowpass / Bandpass Filter"]
+        Biquad1 --> GunshotGain["Decay Gain Envelope"]
+        GunshotGain --> MasterGain
+        
+        Osc1["Oscillator (Sine / Triangle)"] --> PitchEnv["Exponential Frequency Ramp"]
+        PitchEnv --> BeepGain["Pulsing Timer Gain"]
+        BeepGain --> MasterGain
+        
+        Osc2["Square Wave Oscillator"] --> ClickFilter["Highpass Filter (3 kHz)"]
+        ClickFilter --> SnapGain["Reload Mechanical Click Gain"]
+        SnapGain --> MasterGain
+        
+        Harmonics["Dual Sine Oscillators (F#5, A5, C#6)"] --> ChimeGain["High Exponential Envelope"]
+        ChimeGain --> MasterGain
+    end
+```
+
+- **Gunshots**: White noise bursts fed through a steep lowpass filter with rapid exponential decay ($0.12\text{s}$).
+- **Hitmarkers & Headshots**: High-frequency dual sine chords ($1200\text{Hz}$ / $1760\text{Hz}$) for crisp acoustic confirmation.
+- **Reloading**: Dual mechanical clicks with distinct pitch shifts simulating magazine release and seat insertion.
+- **Bomb Timer Beeps**: Pitch-escalating sine pings with accelerating tempo as the clock ticks down toward zero.
+
+---
+
+## 📁 Repository Structure
 
 ```
 BombDefusalGame/
 ├── assets/
-│   └── banner.jpg               # Cinematic game poster & banner
-├── dist/                        # Production build bundle
+│   ├── banner.jpg                  # Primary cinematic game banner
+│   ├── gameplay_tactical.jpg       # ADS tactical gameplay action showcase
+│   ├── bomb_defusal_console.jpg    # Close-up wire defusal terminal showcase
+│   └── enemy_archetypes.jpg        # Tactical squad archetypes lineup
+├── dist/                           # Optimized production bundle generated by Vite
 ├── src/
-│   ├── main.js                  # Three.js engine, map, player & rifle rig
-│   ├── audioSystem.js           # Procedural Web Audio API sound engine
-│   ├── visualEffects.js         # Particle sparks, rain storm, lightning & screen shake
-│   ├── enemyTypes.js            # Enemy archetypes & sniper red laser targeting
-│   ├── pickups.js               # Tactical 3D glowing health & ammo loot crates
-│   ├── levelManager.js          # Campaign levels, stats tracking & Victory modal
-│   ├── combatEnhancements.js    # Combat AI, health HUD, wire puzzle
-│   ├── enemyMovement.js         # Safe navigation, sliding, & escape routing
-│   ├── enemyPatrol.js           # Route planning, stuck recovery, & yaw turns
-│   ├── enemyCombatMovement.js   # Dynamic combat repositioning & strafing
-│   ├── enemyFeedback.js         # 3D projected markers & spotted HUD banner
-│   └── enemyInvestigation.js    # Gunshot acoustic sensor & investigation pathing
-├── index.html                   # Game HTML shell & HUD elements
-├── style.css                    # Tactical dark-mode HUD styling
-├── package.json                 # Project configuration & npm scripts
-├── PROJECT_STATE.md             # Detailed developer resumption log
-├── LICENSE                      # MIT License
-└── .gitignore                   # Git ignore file
+│   ├── main.js                     # Core Three.js engine, map, player physics, ADS & radar HUD
+│   ├── audioSystem.js              # 100% procedural Web Audio sound synthesis engine
+│   ├── visualEffects.js            # Particle systems: weather, rain, lightning, sparks & screen shake
+│   ├── enemyTypes.js               # Enemy class archetypes & sniper dynamic red laser sight
+│   ├── pickups.js                  # 3D interactive tactical loot drops (Medkits & Ammo boxes)
+│   ├── levelManager.js             # Campaign level progression, scoring formulas & Victory debrief
+│   ├── combatEnhancements.js       # Advanced combat AI orchestrator & wire puzzle UI
+│   ├── enemyMovement.js            # Bounding box obstacle sliding & 8-direction escape logic
+│   ├── enemyPatrol.js              # Sector patrol routes, waypoint turns & stuck recovery
+│   ├── enemyCombatMovement.js      # Tactical strafing, flanking, and distance management
+│   ├── enemyFeedback.js            # 3D-to-2D projected alert markers & enemy spotted banners
+│   └── enemyInvestigation.js       # Acoustic gunshot sensor & pathing toward sound origin
+├── index.html                      # Semantic HTML5 HUD shell, radar canvas, and wire modal
+├── style.css                       # Military glassmorphism styling, crosshairs & radar animations
+├── package.json                    # Project configuration, dependencies, and npm scripts
+├── PROJECT_STATE.md                # Comprehensive developer log and architectural reference
+├── LICENSE                         # MIT License
+└── .gitignore                      # Git ignore patterns
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start & Local Play
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (version 18+ recommended)
-- Modern WebGL-compatible browser (Chrome, Edge, Firefox, Brave, Safari)
+- Any modern WebGL-compatible browser (Google Chrome, Microsoft Edge, Mozilla Firefox, Brave, Safari)
 
 ### Installation & Launch
 
@@ -187,18 +396,18 @@ BombDefusalGame/
    cd Bomb_Defusal
    ```
 
-2. **Install dependencies**:
+2. **Install project dependencies**:
    ```bash
    npm install
    ```
 
-3. **Start local development server**:
+3. **Start the local development server**:
    ```bash
    npm run dev
    ```
 
-4. **Open in browser**:
-   Navigate to `http://localhost:5173/` and click anywhere on the canvas to lock controls and begin!
+4. **Play the game**:
+   Open **`http://localhost:5173/`** in your browser. Click anywhere on the screen to lock your mouse cursor and start playing!
 
 5. **Build for production**:
    ```bash
@@ -207,9 +416,18 @@ BombDefusalGame/
 
 ---
 
+## 🛠️ Performance & Optimization
+
+- **Draw Call Efficiency**: Geometries are merged or reused via shared materials for village houses, crates, and street props.
+- **Hardware Pointer Lock**: Utilizes the native W3C Pointer Lock API for smooth mouse control without cursor drift.
+- **Zero Heavy Audio Files**: 0 MB sound assets loaded over network—all audio is generated purely on the client CPU via Web Audio API.
+- **Adaptive Delta Timing**: Clamped physics timestep prevents tunneling or falling through geometry on frame rate drops.
+
+---
+
 ## 📄 License
 
-This project is distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for full details.
+This project is licensed under the **MIT License**. See the [`LICENSE`](./LICENSE) file for complete details.
 
 <div align="center">
   <sub>Crafted with passion for tactical web gaming • Designed & Developed by <a href="https://github.com/Snigdha-0210">Snigdha</a></sub>
